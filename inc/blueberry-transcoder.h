@@ -54,38 +54,88 @@ typedef uint32_t BbArray;
 //*******************************************************************************************
 //Function Prototypes
 //*******************************************************************************************
+
+
 /**
- * gets a single byte value from a block
+ *  gets an 8-bit, unsigned integer from the specified block
  */
 uint8_t getBbUint8(Bb* buf, BbBlock p, uint32_t i);
+
 /**
- * sets a single byte value in a block
+ * sets an 8-bit, unsigned integer in the specified block
  */
 void setBbUint8(Bb* buf, BbBlock p, uint32_t i, uint8_t v);
 
+/**
+ * gets an 8-bit, signed integer from thespecified block
+ */
 int8_t getBbInt8(Bb* buf, BbBlock p, uint32_t i);
+
+/**
+ * sets an 8-bit signed integer in the specified block
+ */
 void setBbInt8(Bb* buf, BbBlock p, uint32_t i, int8_t v);
 
-uint16_t getBbUint8(Bb* buf, BbBlock p, uint32_t i);
-void setBbUint8(Bb* buf, BbBlock p, uint32_t i, uint16_t v);
 
-int16_t getBbInt8(Bb* buf, BbBlock p, uint32_t i);
-void setBbInt8(Bb* buf, BbBlock p, uint32_t i, int16_t v);
+/**
+ *  gets a 16-bit, unsigned integer from the specified block
+ */
+uint16_t getBbUint16(Bb* buf, BbBlock p, uint32_t i);
 
-uint32_t getBbUint8(Bb* buf, BbBlock p, uint32_t i);
-void setBbUint8(Bb* buf, BbBlock p, uint32_t i, uint32_t v);
+/**
+ * sets a 16-bit, unsigned integer in the specified block
+ */
+void setBbUint16(Bb* buf, BbBlock p, uint32_t i, uint16_t v);
 
-int32_t getBbInt8(Bb* buf, BbBlock p, uint32_t i);
-void setBbInt8(Bb* buf, BbBlock p, uint32_t i, int32_t v);
+/**
+ * gets a 16-bit, signed integer from thespecified block
+ */
+int16_t getBbInt16(Bb* buf, BbBlock p, uint32_t i);
 
-float getBbUint8(Bb* buf, BbBlock p, uint32_t i);
-void setBbUint8(Bb* buf, BbBlock p, uint32_t i, float v);
+/**
+ * sets a 16-bit signed integer in the specified block
+ */
+void setBbInt16(Bb* buf, BbBlock p, uint32_t i, int16_t v);
 
-float getBbInt8(Bb* buf, BbBlock p, uint32_t i);
-void setBbInt8(Bb* buf, BbBlock p, uint32_t i, float v);
+/**
+ *  gets a 32-bit, unsigned integer from the specified block
+ */
+uint32_t getBbUint32(Bb* buf, BbBlock p, uint32_t i);
 
-float getBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum);
-void setBbBool(Bb* buf, BbBlock p, uint32_t i, float v, uint32_t bitNum, bool v);
+/**
+ * sets a 32-bit, unsigned integer in the specified block
+ */
+void setBbUint32(Bb* buf, BbBlock p, uint32_t i, uint32_t v);
+
+/**
+ * gets a 32-bit, signed integer from thespecified block
+ */
+int32_t getBbInt32(Bb* buf, BbBlock p, uint32_t i);
+
+/**
+ * sets a 32-bit signed integer in the specified block
+ */
+void setBbInt32(Bb* buf, BbBlock p, uint32_t i, int32_t v);
+
+/**
+ *  gets a 32-bit, floating point value from the specified block
+ */
+float getBbFloat(Bb* buf, BbBlock p, uint32_t i);
+
+/**
+ * sets a a 32-bit, floating point value in the specified block
+ */
+void setBbFloat(Bb* buf, BbBlock p, uint32_t i, float v);
+
+/**
+ * extracts a boolean from the specified block
+ */
+bool getBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum);
+
+/**
+ * sets a boolean in a specified block
+ */
+void setBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum, bool v);
 
 /**
  * converts a linear index to a circular one
@@ -94,18 +144,7 @@ void setBbBool(Bb* buf, BbBlock p, uint32_t i, float v, uint32_t bitNum, bool v)
  */
 uint32_t bbWrap(uint32_t i, uint32_t n);
 
-/**
- * Computes the index of the next block in a packet.
- * Note that this does not wrap the index - it leaves it as if the buffer is linear.
- * This is for convenience of testing for bounds
- * @return the next block in the paycket
- */
-Block getBbNextBlock(Bb* buf, BbBlock p);
-/**
- * checks if there is another block in this packet given the last decoded block
- */
 
-bool isBbNextBlock(Bb* buf, BbBlock p);
 
 
 
