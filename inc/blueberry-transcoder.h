@@ -33,6 +33,9 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Types
 //*******************************************************************************************
+/**
+ * defines all the info needed to begin parsing a packet
+ */
 typedef struct {
     uint8_t* buffer;//a pointer to an array of bytes (i.e. the buffer)
     uint32_t start;//the index of the first byte of the packet
@@ -40,8 +43,9 @@ typedef struct {
     uint32_t bufferLength;//the length of the buffer, assuming it's circular
 } Bb;
 
-typedef uint32_t BbBlock //this is really an index into the buffer, although it is assumed to be linear, even if the buffer wraps partway through the packet. If this value is i and the packet length is n, then 0 <= i < n.
-tyepdef uint32_t BbArray
+
+typedef uint32_t BbBlock; //this is really an index into the buffer, although it is assumed to be linear, even if the buffer wraps partway through the packet. If this value is i and the packet length is n, then 0 <= i < n.
+typedef uint32_t BbArray;
 
 //*******************************************************************************************
 //Variables
@@ -83,6 +87,11 @@ void setBbInt8(Bb* buf, BbBlock p, uint32_t i, float v);
 float getBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum);
 void setBbBool(Bb* buf, BbBlock p, uint32_t i, float v, uint32_t bitNum, bool v);
 
+/**
+ * converts a linear index to a circular one
+ * essentially mods the index with the buffer size
+ * @return the wrapped index
+ */
 uint32_t bbWrap(uint32_t i, uint32_t n);
 
 /**
@@ -92,6 +101,9 @@ uint32_t bbWrap(uint32_t i, uint32_t n);
  * @return the next block in the paycket
  */
 Block getBbNextBlock(Bb* buf, BbBlock p);
+/**
+ * checks if there is another block in this packet given the last decoded block
+ */
 
 bool isBbNextBlock(Bb* buf, BbBlock p);
 
