@@ -142,8 +142,7 @@ void setBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum, bool v);
  * essentially mods the index with the buffer size
  * @return the wrapped index
  */
-uint32_t bbWrap(uint32_t i, uint32_t n);
-
+uint32_t bbWrap(Bb* buf, int i);
 /**
  * computes the crc of the buffer from it's start up to the specified block
  */

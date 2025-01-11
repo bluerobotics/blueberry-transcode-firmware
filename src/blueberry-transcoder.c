@@ -52,14 +52,14 @@ THE SOFTWARE.
  *  @param i the index offset
  */
 uint8_t getBbUint8(Bb* buf, BbBlock p, uint32_t i){
-	return buf->buffer[bbWrap(buf->start + p + i)];
+	return buf->buffer[bbWrap(buf, p + i)];
 }
 
 /**
  * sets an 8-bit, unsigned integer in the specified block
  */
 void setBbUint8(Bb* buf, BbBlock p, uint32_t i, uint8_t v){
-	buf->buffer[bbWrap(buf->start + p + i)] = v;
+	buf->buffer[bbWrap(buf, p + i)] = v;
 }
 
 /**
@@ -182,7 +182,7 @@ bool getBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum){
  * sets a boolean in a specified block
  */
 void setBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum, bool v){
-	uint8_t* b = &(buf->buffer[bbWrap(buf->start + p + i)]);
+	uint8_t* b = &(buf->buffer[bbWrap(buf, p + i)]);
 	uint8_t m = 1 << bitNum;
 	if(v){
 		*b |= m;
@@ -196,8 +196,10 @@ void setBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum, bool v){
  * essentially mods the index with the buffer size
  * @return the wrapped index
  */
-uint32_t bbWrap(uint32_t i, uint32_t n){
-	return i % n;
+uint32_t bbWrap(Bb* buf, int i){
+	uint32_t j = i + buf->start;
+	uint32_t n = buf->bufferLength;
+	return j % n;
 }
 /**
  * computes the crc of the buffer from it's start up to the specified block
