@@ -44,8 +44,8 @@ typedef struct {
 } Bb;
 
 
-typedef uint32_t BbBlock; //this is really an index into the buffer, although it is assumed to be linear, even if the buffer wraps partway through the packet. If this value is i and the packet length is n, then 0 <= i < n.
-typedef uint32_t BbArray;
+typedef uint32_t BbBlock; //this is really an index into the buffer, measured in bytes, although it is assumed to be linear, even if the buffer wraps partway through the packet. If this value is i and the packet length is n, then 0 <= i < n.
+typedef uint32_t BbArray;//ditto
 
 //*******************************************************************************************
 //Variables
@@ -144,8 +144,10 @@ void setBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum, bool v);
  */
 uint32_t bbWrap(uint32_t i, uint32_t n);
 
-
-
+/**
+ * computes the crc of the buffer from it's start up to the specified block
+ */
+uint16_t computeCrc(Bb* buf, BbBlock p);
 
 
 

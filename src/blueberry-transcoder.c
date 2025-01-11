@@ -47,16 +47,19 @@ THE SOFTWARE.
 
 /**
  *  gets an 8-bit, unsigned integer from the specified block
+ *  @param buf the buffer to read
+ *  @param p the block offset
+ *  @param i the index offset
  */
 uint8_t getBbUint8(Bb* buf, BbBlock p, uint32_t i){
-	return buf->buffer[bbWrap(p + i)];
+	return buf->buffer[bbWrap(buf->start + p + i)];
 }
 
 /**
  * sets an 8-bit, unsigned integer in the specified block
  */
 void setBbUint8(Bb* buf, BbBlock p, uint32_t i, uint8_t v){
-	buf->buffer[bbWrap(p + i)] = v;
+	buf->buffer[bbWrap(buf->start + p + i)] = v;
 }
 
 /**
@@ -179,7 +182,7 @@ bool getBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum){
  * sets a boolean in a specified block
  */
 void setBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum, bool v){
-	uint8_t* b = &(buf->buffer[bbWrap(p + i)]);
+	uint8_t* b = &(buf->buffer[bbWrap(buf->start + p + i)]);
 	uint8_t m = 1 << bitNum;
 	if(v){
 		*b |= m;
@@ -195,5 +198,22 @@ void setBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum, bool v){
  */
 uint32_t bbWrap(uint32_t i, uint32_t n){
 	return i % n;
+}
+/**
+ * computes the crc of the buffer from it's start up to the specified block
+ */
+uint16_t computeCrc(Bb* buf, BbBlock p){
+	uint32_t n = p - buf->start;
+	if(n & 0b11){
+		//what to do here, this should have been a multiple of 4
+		n += 0b100;
+	}
+	n >> 2;
+	uint32_t* is = (uint32_t*)buf;
+	uint16_t crc = 0xffff;
+	for(uint32_t i = 0; i < n; ++i){
+		crc1021P32(&crc, is[i]);
+	}
+	return crc;
 }
 
