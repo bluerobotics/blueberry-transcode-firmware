@@ -120,12 +120,12 @@ void setBbInt32(Bb* buf, BbBlock p, uint32_t i, int32_t v);
 /**
  *  gets a 32-bit, floating point value from the specified block
  */
-float getBbFloat(Bb* buf, BbBlock p, uint32_t i);
+float getBbFloat32(Bb* buf, BbBlock p, uint32_t i);
 
 /**
  * sets a a 32-bit, floating point value in the specified block
  */
-void setBbFloat(Bb* buf, BbBlock p, uint32_t i, float v);
+void setBbFloat32(Bb* buf, BbBlock p, uint32_t i, float v);
 
 /**
  * extracts a boolean from the specified block

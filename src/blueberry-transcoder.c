@@ -155,7 +155,7 @@ void setBbInt32(Bb* buf, BbBlock p, uint32_t i, int32_t v){
 /**
  *  gets a 32-bit, floating point value from the specified block
  */
-float getBbFloat(Bb* buf, BbBlock p, uint32_t i){
+float getBbFloat32(Bb* buf, BbBlock p, uint32_t i){
 	uint32_t ip = getBbUint32(buf, p, i);
 	float* fp = (float*)(&ip);
 	return *fp;
@@ -164,10 +164,10 @@ float getBbFloat(Bb* buf, BbBlock p, uint32_t i){
 /**
  * sets a a 32-bit, floating point value in the specified block
  */
-void setBbFloat(Bb* buf, BbBlock p, uint32_t i, float v){
+void setBbFloat32(Bb* buf, BbBlock p, uint32_t i, float v){
 	float* fp = &v;
 	uint32_t* ip = (uint32_t*)fp;
-	setBbUint32(buf, p, i, ip);
+	setBbUint32(buf, p, i, *ip);
 }
 
 /**
