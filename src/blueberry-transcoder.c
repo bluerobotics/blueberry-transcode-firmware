@@ -25,6 +25,8 @@ THE SOFTWARE.
 //Includes
 //*******************************************************************************************
 #include <blueberry-transcoder.h>
+
+#include <crc1021.h>
 //*******************************************************************************************
 //Defines
 //*******************************************************************************************
@@ -82,7 +84,7 @@ void setBbInt8(Bb* buf, BbBlock p, uint32_t i, int8_t v){
  */
 uint16_t getBbUint16(Bb* buf, BbBlock p, uint32_t i){
 	uint16_t result;
-	uint8_t* bs = &result;
+	uint8_t* bs = (uint8_t*)&result;
 	bs[0] = getBbUint8(buf, p, i);
 	bs[1] = getBbUint8(buf, p, i+1);
 	return result;
@@ -92,7 +94,7 @@ uint16_t getBbUint16(Bb* buf, BbBlock p, uint32_t i){
  * sets a 16-bit, unsigned integer in the specified block
  */
 void setBbUint16(Bb* buf, BbBlock p, uint32_t i, uint16_t v){
-	uint8_t* bs = &v;
+	uint8_t* bs = (uint8_t*)&v;
 	setBbUint8(buf, p, i,   bs[0]);
 	setBbUint8(buf, p, i+1, bs[1]);
 }
@@ -116,7 +118,7 @@ void setBbInt16(Bb* buf, BbBlock p, uint32_t i, int16_t v){
  */
 uint32_t getBbUint32(Bb* buf, BbBlock p, uint32_t i){
 	uint32_t result;
-	uint8_t* bs = &result;
+	uint8_t* bs = (uint8_t*)&result;
 	bs[0] = getBbUint8(buf, p, i);
 	bs[1] = getBbUint8(buf, p, i+1);
 	bs[2] = getBbUint8(buf, p, i+2);
@@ -128,7 +130,7 @@ uint32_t getBbUint32(Bb* buf, BbBlock p, uint32_t i){
  * sets a 32-bit, unsigned integer in the specified block
  */
 void setBbUint32(Bb* buf, BbBlock p, uint32_t i, uint32_t v){
-	uint8_t* bs = &v;
+	uint8_t* bs = (uint8_t*)&v;
 	setBbUint8(buf, p, i,   bs[0]);
 	setBbUint8(buf, p, i+1, bs[1]);
 	setBbUint8(buf, p, i+2, bs[2]);
@@ -175,7 +177,7 @@ void setBbFloat32(Bb* buf, BbBlock p, uint32_t i, float v){
  */
 bool getBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum){
 	uint8_t bf = getBbUint8(buf, p, i);
-	return bf & (1<<bitNum) != 0;
+	return (bf & (1<<bitNum)) != 0;
 }
 
 /**
@@ -210,7 +212,7 @@ uint16_t computeCrc(Bb* buf, BbBlock p){
 		//what to do here, this should have been a multiple of 4
 		n += 0b100;
 	}
-	n >> 2;
+	n >>= 2;
 	uint32_t* is = (uint32_t*)buf;
 	uint16_t crc = 0xffff;
 	for(uint32_t i = 0; i < n; ++i){
