@@ -20,8 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef BLUEBERRY_TRANSCODE_FIRMWARE_INC_BLUEBERRY_RECEIVER_H_
-#define BLUEBERRY_TRANSCODE_FIRMWARE_INC_BLUEBERRY_RECEIVER_H_
+#ifndef BLUEBERRY_RECEIVER_H_
+#define BLUEBERRY_RECEIVER_H_
 
 //*******************************************************************************************
 //Includes
@@ -38,10 +38,7 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Types
 //*******************************************************************************************
-typedef struct {
-	uint32_t rxTime;
-	Bb packet;
-} BlueberryReceiverState;
+
 
 /**
  * a function pointer definition for checking the received packet
@@ -70,7 +67,7 @@ typedef bool (*CheckFunction)(Bb*);
  * @param crcCheck - a function to check the CRC of the received bytes. It will return true with a correct match
  *
  */
-Bb* blueberryReceive(BlueberryReceiverState* s, ByteQ* q, uint32_t n, CheckFunction startWordCheck, CheckFunction lengthCheck, CheckFunction crcCheck);
+bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n, CheckFunction startWordCheck, CheckFunction lengthCheck, CheckFunction crcCheck);
 /**
  * Receive all bytes from the queue, or as many as is necessary to receive the packet
  * Assumes that the packet starts at the beginning of the queue
@@ -82,14 +79,14 @@ Bb* blueberryReceive(BlueberryReceiverState* s, ByteQ* q, uint32_t n, CheckFunct
  * @param startWordCheck - a function to test the start word of the packet. It will check only up to the Bb.length. It should return true so long as the start word is good
  * @param lengthCheck - a function to test the length of the received packet so far. It should return true when enough bytes have been received
  */
-Bb* blueberryReceiveAll(BlueberryReceiverState* s, ByteQ* q, PacketCheck startWordCheck, PacketCheck lengthCheck);
+bool blueberryReceiveAll(Bb* bb, ByteQ* q, CheckFunction startWordCheck, CheckFunction lengthCheck);
 /**
  * Free up data from the byte queue and prep the state
  */
-void blueberryReceiveDone(BlueberryReceiverState* s, ByteQ* q);
+void blueberryReceiveDone(Bb* bb, ByteQ* q);
 
 //*******************************************************************************************
 //Code
 //*******************************************************************************************
 
-#endif /* BLUEBERRY_TRANSCODE_FIRMWARE_INC_BLUEBERRY_RECEIVER_H_ */
+#endif /* BLUEBERRY_RECEIVER_H_ */

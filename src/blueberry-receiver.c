@@ -74,9 +74,8 @@ bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n, CheckFunction startWordCheck
 		bb->buffer = q->buffer;
 		bb->bufferLength = q->bufferSize;
 		bb->start = q->front;
-
 	}
-
+	//figure out how many bytes to receive
 	uint32_t m = getBytesUsed(q);
 	if(m > n){
 		m = n;
@@ -85,7 +84,7 @@ bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n, CheckFunction startWordCheck
 	//cycle through all the bytes so far
 	for(uint32_t i = 0; i < m; ++i){
 
-		++(s->packet.length);
+		++(bb->length);
 
 		if(startWordCheck(bb)){
 			if(lengthCheck(bb)){
@@ -105,9 +104,7 @@ bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n, CheckFunction startWordCheck
 			bb->start = q->front;
 		}
 	}
-
 	return result;
-
 }
 /**
  * Receive all bytes from the queue, or as many as is necessary to receive the packet
@@ -123,7 +120,7 @@ bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n, CheckFunction startWordCheck
  * @param lengthCheck - a function to test the length of the received packet so far. It should return true when enough bytes have been received and also populate the length field of the packet
  * @return true if a valid packet was received
  */
-bool blueberryReceiveAll(Bb* bb, ByteQ* q, PacketCheck startWordCheck, PacketCheck lengthCheck){
+bool blueberryReceiveAll(Bb* bb, ByteQ* q, CheckFunction startWordCheck, CheckFunction lengthCheck){
 	bool result = false;
 	bb->buffer = q->buffer;
 	bb->bufferLength = q->bufferSize;
@@ -139,6 +136,7 @@ bool blueberryReceiveAll(Bb* bb, ByteQ* q, PacketCheck startWordCheck, PacketChe
 	if(!result){
 		//throw out the queue contents - the packet was no good
 		discardFromByteQ(q, n);
+		bb->length = 0;
 	}
 
 	return result;
@@ -151,17 +149,12 @@ bool blueberryReceiveAll(Bb* bb, ByteQ* q, PacketCheck startWordCheck, PacketChe
 void blueberryReceiveDone(Bb* bb, ByteQ* q){
 	discardFromByteQ(q, bb->length);
 	bb->rxTime = 0;
-	bb->length = 0;
-	bb->bufferLength = 0;
-	bb->start = 0;
-	bb->buffer = NULL;
+	bb->length = 0;//this indicates that the state is reset
+	bb->bufferLength = 0;//don't really need to do this
+	bb->start = 0;//don't really need to do this
+	bb->buffer = NULL;//nor this
 
 
 }
 
-bool blueberryReceive(BlueberryRecieveState* s, ByteQ* q, uint32_t startWord, uint32_t length, )
 
-
-bool brPacketCheckBb(Bb* buf){
-
-}

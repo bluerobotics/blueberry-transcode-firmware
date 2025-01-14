@@ -20,6 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#ifndef BLUEBERRY_TRANSCODE_FIRMWARE_H_
+#define BLUEBERRY_TRANSCODE_FIRMWARE_H_
+
 
 //*******************************************************************************************
 //Includes
@@ -160,3 +163,7 @@ uint16_t computeCrc(Bb* buf, BbBlock p);
 //*******************************************************************************************
 //Code
 //*******************************************************************************************
+
+
+#endif /* BLUEBERRY_TRANSCODE_FIRMWARE_H_ */
+
