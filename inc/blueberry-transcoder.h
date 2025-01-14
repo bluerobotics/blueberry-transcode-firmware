@@ -34,7 +34,9 @@ THE SOFTWARE.
 //Types
 //*******************************************************************************************
 /**
- * defines all the info needed to begin parsing a packet
+ * defines a data structure for containing the bytes of a packet
+ * Very similar to a byte queue
+ * Is circular if the length + start is greater than the buffer length
  */
 typedef struct {
     uint8_t* buffer;//a pointer to an array of bytes (i.e. the buffer)
