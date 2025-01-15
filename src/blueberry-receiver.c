@@ -67,7 +67,7 @@ THE SOFTWARE.
  * @return true if a valid packet was received
  *
  */
-bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n, CheckFunction startWordCheck, CheckFunction lengthCheck, CheckFunction crcCheck){
+bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n, CheckFunction preambleCheck, CheckFunction lengthCheck, CheckFunction crcCheck){
 	bool result = false;
 	bool fail = false;
 	if( bb->length == 0){
@@ -86,7 +86,7 @@ bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n, CheckFunction startWordCheck
 
 		++(bb->length);
 
-		if(startWordCheck(bb)){
+		if(preambleCheck(bb)){
 			if(lengthCheck(bb)){
 				if(crcCheck(bb)){
 					result = true;
