@@ -20,6 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#ifndef BLUEBERRY_TRANSCODE_FIRMWARE_H_
+#define BLUEBERRY_TRANSCODE_FIRMWARE_H_
+
 
 //*******************************************************************************************
 //Includes
@@ -43,7 +46,10 @@ typedef struct {
     uint32_t start;//the index of the first byte of the packet
     uint32_t length;//the length of the packet in 4-byte words
     uint32_t bufferLength;//the length of the buffer, assuming it's circular
+    uint32_t rxTime; //the time that this packet was received, in
 } Bb;
+
+
 
 
 typedef uint32_t BbBlock; //this is really an index into the buffer, measured in bytes, although it is assumed to be linear, even if the buffer wraps partway through the packet. If this value is i and the packet length is n, then 0 <= i < n.
@@ -157,3 +163,7 @@ uint16_t computeCrc(Bb* buf, BbBlock p);
 //*******************************************************************************************
 //Code
 //*******************************************************************************************
+
+
+#endif /* BLUEBERRY_TRANSCODE_FIRMWARE_H_ */
+
