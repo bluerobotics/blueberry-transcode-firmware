@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include <stdint.h>
 #include <stdbool.h>
 #include <blueberry-transcoder.h>
+#include <blueberry-receiver.h>
 
 //*******************************************************************************************
 //Defines
