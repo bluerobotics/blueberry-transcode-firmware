@@ -154,8 +154,7 @@ uint32_t bbWrap(Bb* buf, int i);
 /**
  * computes the crc of the buffer from it's start up to the specified block
  */
-uint16_t computeCrc(Bb* buf, BbBlock p);
-
+uint16_t computeCrc(Bb* buf, BbBlock start, BbBlock end);
 
 
 

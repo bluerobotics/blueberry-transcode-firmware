@@ -204,19 +204,38 @@ uint32_t bbWrap(Bb* buf, int i){
 	return j % n;
 }
 /**
- * computes the crc of the buffer from it's start up to the specified block
+ * computes the crc of the buffer
+ * @param buf the buffer
+ * @param start the first element
+ * @param one past the last element
  */
-uint16_t computeCrc(Bb* buf, BbBlock p){
-	uint32_t n = p - buf->start;
-	if(n & 0b11){
-		//what to do here, this should have been a multiple of 4
-		n += 0b100;
+uint16_t computeCrc(Bb* buf, BbBlock start, BbBlock end){
+
+	uint32_t i0, i1, i2, i3;
+	i0 = buf->start + start;
+	uint32_t n = buf->bufferLength;
+	if(end < buf->start + start){//check if this buffer wraps
+		i1 = n;
+		i2 = 0;
+		i3 = end;
+	} else {
+		i1 = end;
+		i2 = 0;
+		i3 = 0;
 	}
-	n >>= 2;
+
 	uint32_t* is = (uint32_t*)buf;
 	uint16_t crc = 0xffff;
-	for(uint32_t i = 0; i < n; ++i){
+	//do from the start to either the buffer end or the block end
+	for(uint32_t i = i0; i < i1; i += 4){
 		crc1021P32(&crc, is[i]);
+		getCrc1021P(&crc);
+	}
+	//now do from the buffer start to the block end, but only if the buffer has wrapped
+	for(uint32_t i = i2; i < i3; i += 4){
+		crc1021P32(&crc, is[i]);
+		getCrc1021P(&crc);
+
 	}
 	return crc;
 }
