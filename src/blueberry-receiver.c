@@ -148,7 +148,7 @@ bool blueberryReceiveAll(Bb* bb, ByteQ* q, CheckFunction startWordCheck, CheckFu
  */
 void blueberryReceiveDone(Bb* bb, ByteQ* q){
 	discardFromByteQ(q, bb->length);
-	bb->rxTime = 0;
+	bb->time = 0;
 	bb->length = 0;//this indicates that the state is reset
 	bb->bufferLength = 0;//don't really need to do this
 	bb->start = 0;//don't really need to do this

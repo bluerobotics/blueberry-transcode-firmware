@@ -46,7 +46,7 @@ typedef struct {
     uint32_t start;//the index of the first byte of the packet
     uint32_t length;//the length of the packet in 4-byte words
     uint32_t bufferLength;//the length of the buffer, assuming it's circular
-    uint32_t rxTime; //the time that this packet was received, in
+    uint32_t time; //the time that this packet was received, in
 } Bb;
 
 
