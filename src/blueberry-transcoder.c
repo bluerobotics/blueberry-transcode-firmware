@@ -217,11 +217,11 @@ uint16_t computeCrc(Bb* buf, BbBlock start, BbBlock end){
 		uint32_t w = getBbUint32(buf, i, 0);
 
 		crc1021P32(&crc, w);
-		getCrc1021P(&crc);
+//		getCrc1021P(&crc);
 	}
 
 	//do from the start to either the buffer end or the block end
-
+	getCrc1021P(&crc);
 	return crc;
 }
 
