@@ -67,17 +67,18 @@ THE SOFTWARE.
  * @return true if a valid packet was received
  *
  */
-bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n, CheckFunction preambleCheck, CheckFunction lengthCheck, CheckFunction crcCheck){
+bool blueberryReceive(Bb* inPacket, ByteQ* q, uint32_t n, CheckFunction preambleCheck, CheckFunction lengthCheck, CheckFunction crcCheck){
 	bool result = false;
 	bool fail = false;
-	if( bb->length == 0){
-		bb->buffer = q->buffer;
-		bb->bufferLength = q->bufferSize;
-		bb->start = q->front;
+	if( inPacket->length == 0){
+		inPacket->buffer = q->buffer;
+		inPacket->bufferLength = q->bufferSize;
+		inPacket->start = q->front;
+		inPacket->time = getTimeInMicroSeconds();
 	}
 	//figure out how many bytes to receive
 	//note that any new bytes will be the difference between the size of bb and the amount on the queue
-	uint32_t m = getBytesUsed(q) - bb->length;
+	uint32_t m = getBytesUsed(q) - inPacket->length;
 	if(m > n){
 		m = n;
 	}
@@ -85,11 +86,11 @@ bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n, CheckFunction preambleCheck,
 	//cycle through all the bytes so far
 	for(uint32_t i = 0; i < m; ++i){
 
-		++(bb->length);
+		++(inPacket->length);
 
-		if(preambleCheck(bb)){
-			if(lengthCheck(bb)){
-				if(crcCheck(bb)){
+		if(preambleCheck(inPacket)){
+			if(lengthCheck(inPacket)){
+				if(crcCheck(inPacket)){
 					result = true;
 					break;
 				} else {
@@ -100,9 +101,9 @@ bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n, CheckFunction preambleCheck,
 			fail = true;
 		}
 		if(fail){
-			discardFromByteQ(q, bb->length);
-			bb->length = 0;
-			bb->start = q->front;
+			discardFromByteQ(q, inPacket->length);
+			inPacket->length = 0;
+			inPacket->start = q->front;
 		}
 	}
 	return result;
