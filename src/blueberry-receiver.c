@@ -76,7 +76,8 @@ bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n, CheckFunction preambleCheck,
 		bb->start = q->front;
 	}
 	//figure out how many bytes to receive
-	uint32_t m = getBytesUsed(q);
+	//note that any new bytes will be the difference between the size of bb and the amount on the queue
+	uint32_t m = getBytesUsed(q) - bb->length;
 	if(m > n){
 		m = n;
 	}
