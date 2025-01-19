@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include <stddef.h>
 
 #include <brPacket.h>
+#include <fastcodeUtil.h>
 
 //*******************************************************************************************
 //Defines
