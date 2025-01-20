@@ -29,7 +29,8 @@ THE SOFTWARE.
 #include <stddef.h>
 
 #include <brPacket.h>
-#include <fastcodeUtil.h>
+#include <timeSync.h>
+//#include <fastcodeUtil.h>
 
 //*******************************************************************************************
 //Defines
@@ -75,7 +76,7 @@ bool blueberryReceive(Bb* inPacket, ByteQ* q, uint32_t n, CheckFunction preamble
 		inPacket->buffer = q->buffer;
 		inPacket->bufferLength = q->bufferSize;
 		inPacket->start = q->front;
-		inPacket->time = getTimeInMicroSeconds();
+		inPacket->time = getLocalTimeMillis();
 	}
 	//figure out how many bytes to receive
 	//note that any new bytes will be the difference between the size of bb and the amount on the queue
