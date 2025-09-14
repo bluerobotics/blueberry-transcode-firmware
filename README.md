@@ -5,4 +5,4 @@ Prototype, C specific codebase for Blueberry message transcoding. This code is p
 
 You can find the Java equivalent of this project here: https://github.com/bluerobotics/blueberry-transcode-java
 
-This is not ready for prime-timme yet!
+This is not ready for prime-time yet!
