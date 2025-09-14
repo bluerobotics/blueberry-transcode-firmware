@@ -84,8 +84,8 @@ void setBbUint8(Bb* buf, BbBlock p, uint32_t i, float v);
 float getBbInt8(Bb* buf, BbBlock p, uint32_t i);
 void setBbInt8(Bb* buf, BbBlock p, uint32_t i, float v);
 
-float getBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum);
-void setBbBool(Bb* buf, BbBlock p, uint32_t i, float v, uint32_t bitNum, bool v);
+float getBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitMask);
+void setBbBool(Bb* buf, BbBlock p, uint32_t i, float v, uint32_t bitMask, bool v);
 
 /**
  * converts a linear index to a circular one
