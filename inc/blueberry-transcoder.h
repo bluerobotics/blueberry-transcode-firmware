@@ -20,6 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#ifndef BLUEBERRY_TRANSCODE_FIRMWARE_H_
+#define BLUEBERRY_TRANSCODE_FIRMWARE_H_
+
 
 //*******************************************************************************************
 //Includes
@@ -34,18 +37,23 @@ THE SOFTWARE.
 //Types
 //*******************************************************************************************
 /**
- * defines all the info needed to begin parsing a packet
+ * defines a data structure for containing the bytes of a packet
+ * Very similar to a byte queue
+ * Is circular if the length + start is greater than the buffer length
  */
 typedef struct {
     uint8_t* buffer;//a pointer to an array of bytes (i.e. the buffer)
     uint32_t start;//the index of the first byte of the packet
-    uint32_t length;//the length of the packet in 4-byte words
+    uint32_t length;//the length of the packet in bytes
     uint32_t bufferLength;//the length of the buffer, assuming it's circular
+    uint32_t time; //the time that this packet was received, in
 } Bb;
 
 
-typedef uint32_t BbBlock; //this is really an index into the buffer, although it is assumed to be linear, even if the buffer wraps partway through the packet. If this value is i and the packet length is n, then 0 <= i < n.
-typedef uint32_t BbArray;
+
+
+typedef uint32_t BbBlock; //this is really an index into the buffer, measured in bytes, although it is assumed to be linear, even if the buffer wraps partway through the packet. If this value is i and the packet length is n, then 0 <= i < n.
+typedef uint32_t BbArray;//ditto
 
 //*******************************************************************************************
 //Variables
@@ -54,60 +62,99 @@ typedef uint32_t BbArray;
 //*******************************************************************************************
 //Function Prototypes
 //*******************************************************************************************
+
+
 /**
- * gets a single byte value from a block
+ *  gets an 8-bit, unsigned integer from the specified block
  */
 uint8_t getBbUint8(Bb* buf, BbBlock p, uint32_t i);
+
 /**
- * sets a single byte value in a block
+ * sets an 8-bit, unsigned integer in the specified block
  */
 void setBbUint8(Bb* buf, BbBlock p, uint32_t i, uint8_t v);
 
+/**
+ * gets an 8-bit, signed integer from thespecified block
+ */
 int8_t getBbInt8(Bb* buf, BbBlock p, uint32_t i);
+
+/**
+ * sets an 8-bit signed integer in the specified block
+ */
 void setBbInt8(Bb* buf, BbBlock p, uint32_t i, int8_t v);
 
-uint16_t getBbUint8(Bb* buf, BbBlock p, uint32_t i);
-void setBbUint8(Bb* buf, BbBlock p, uint32_t i, uint16_t v);
 
-int16_t getBbInt8(Bb* buf, BbBlock p, uint32_t i);
-void setBbInt8(Bb* buf, BbBlock p, uint32_t i, int16_t v);
+/**
+ *  gets a 16-bit, unsigned integer from the specified block
+ */
+uint16_t getBbUint16(Bb* buf, BbBlock p, uint32_t i);
 
-uint32_t getBbUint8(Bb* buf, BbBlock p, uint32_t i);
-void setBbUint8(Bb* buf, BbBlock p, uint32_t i, uint32_t v);
+/**
+ * sets a 16-bit, unsigned integer in the specified block
+ */
+void setBbUint16(Bb* buf, BbBlock p, uint32_t i, uint16_t v);
 
-int32_t getBbInt8(Bb* buf, BbBlock p, uint32_t i);
-void setBbInt8(Bb* buf, BbBlock p, uint32_t i, int32_t v);
+/**
+ * gets a 16-bit, signed integer from thespecified block
+ */
+int16_t getBbInt16(Bb* buf, BbBlock p, uint32_t i);
 
-float getBbUint8(Bb* buf, BbBlock p, uint32_t i);
-void setBbUint8(Bb* buf, BbBlock p, uint32_t i, float v);
+/**
+ * sets a 16-bit signed integer in the specified block
+ */
+void setBbInt16(Bb* buf, BbBlock p, uint32_t i, int16_t v);
 
-float getBbInt8(Bb* buf, BbBlock p, uint32_t i);
-void setBbInt8(Bb* buf, BbBlock p, uint32_t i, float v);
+/**
+ *  gets a 32-bit, unsigned integer from the specified block
+ */
+uint32_t getBbUint32(Bb* buf, BbBlock p, uint32_t i);
 
-float getBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitMask);
-void setBbBool(Bb* buf, BbBlock p, uint32_t i, float v, uint32_t bitMask, bool v);
+/**
+ * sets a 32-bit, unsigned integer in the specified block
+ */
+void setBbUint32(Bb* buf, BbBlock p, uint32_t i, uint32_t v);
+
+/**
+ * gets a 32-bit, signed integer from thespecified block
+ */
+int32_t getBbInt32(Bb* buf, BbBlock p, uint32_t i);
+
+/**
+ * sets a 32-bit signed integer in the specified block
+ */
+void setBbInt32(Bb* buf, BbBlock p, uint32_t i, int32_t v);
+
+/**
+ *  gets a 32-bit, floating point value from the specified block
+ */
+float getBbFloat32(Bb* buf, BbBlock p, uint32_t i);
+
+/**
+ * sets a a 32-bit, floating point value in the specified block
+ */
+void setBbFloat32(Bb* buf, BbBlock p, uint32_t i, float v);
+
+/**
+ * extracts a boolean from the specified block
+ */
+bool getBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum);
+
+/**
+ * sets a boolean in a specified block
+ */
+void setBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum, bool v);
 
 /**
  * converts a linear index to a circular one
  * essentially mods the index with the buffer size
  * @return the wrapped index
  */
-uint32_t bbWrap(uint32_t i, uint32_t n);
-
+uint32_t bbWrap(Bb* buf, int i);
 /**
- * Computes the index of the next block in a packet.
- * Note that this does not wrap the index - it leaves it as if the buffer is linear.
- * This is for convenience of testing for bounds
- * @return the next block in the paycket
+ * computes the crc of the buffer from it's start up to the specified block
  */
-Block getBbNextBlock(Bb* buf, BbBlock p);
-/**
- * checks if there is another block in this packet given the last decoded block
- */
-
-bool isBbNextBlock(Bb* buf, BbBlock p);
-
-
+uint16_t computeCrc(Bb* buf, BbBlock start, BbBlock end);
 
 
 
@@ -115,3 +162,7 @@ bool isBbNextBlock(Bb* buf, BbBlock p);
 //*******************************************************************************************
 //Code
 //*******************************************************************************************
+
+
+#endif /* BLUEBERRY_TRANSCODE_FIRMWARE_H_ */
+
