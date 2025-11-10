@@ -51,9 +51,13 @@ typedef struct {
 
 
 
-
-typedef uint32_t BbBlock; //this is really an index into the buffer, measured in bytes, although it is assumed to be linear, even if the buffer wraps partway through the packet. If this value is i and the packet length is n, then 0 <= i < n.
-typedef uint32_t BbArray;//ditto
+/**
+ * this is really an index into the buffer, measured in bytes, although it is assumed to be linear,
+ * even if the buffer wraps partway through the packet.
+ * If this value is i and the packet length is n, then 0 <= i < n.
+ */
+typedef uint32_t BbBlock;
+//typedef uint32_t BbArray;//ditto
 
 //*******************************************************************************************
 //Variables
@@ -155,6 +159,41 @@ uint32_t bbWrap(Bb* buf, int i);
  * computes the crc of the buffer from it's start up to the specified block
  */
 uint16_t computeCrc(Bb* buf, BbBlock start, BbBlock end);
+
+/**
+ * Gets the number of bytes for each element of a sequence
+ * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
+ */
+uint16_t getBbSequenceElementByteCount(Bb* buf, BbBlock start, int i);
+/**
+ * Gets a new block index for the specified sequence element
+ * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
+ * @param sequenceElement - the index of the sequence element
+ */
+BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock start, int i, int sequenceElement);
+/**
+ * Gets the number of elements of this sequence
+ * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
+ */
+uint32_t getBbSequenceLength(Bb* buf, Bbblock start, int i);
+/**
+ * Gets the number of bytes for each element of a sequence
+ * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
+ * @param count - the number of bytes for each element of a sequence
+ */
+void setBbSequenceElementByteCount(Bb* buf, BbBlock start, int i, uint16_t count);
+/**Sets the number of bytes for each element of a sequence
+ * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
+ * @param index - the number of bytes for each element of a sequence
+ */
+void setBbSequenceDataIndex(Bb* buf, BbBlock start, int i, uint16_t index);
+/**
+ * Sets the number of elements of this sequence
+ * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
+ * @param length - the number of elements
+ */
+uint32_t setBbSequenceLength(Bb* buf, Bbblock start, int i, uint32_t length);
+
 
 
 
