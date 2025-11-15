@@ -28,7 +28,6 @@ THE SOFTWARE.
 
 #include <stddef.h>
 
-#include <brPacket.h>
 #include <timeSync.h>
 //#include <fastcodeUtil.h>
 
