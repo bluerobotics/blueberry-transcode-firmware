@@ -63,12 +63,9 @@ typedef bool (*CheckFunction)(Bb*);
  * @param s - state for this routine to allow for multiple calls
  * @param q - the queue that the new bytes are coming from
  * @param n - the maximum number of bytes to process - this is to limit the type that this routine will take at one calling
- * @param startWordCheck - a function to test the start word of the packet. It will check only up to the Bb.length. It should return true so long as the start word is good
- * @param lengthCheck - a function to test the length of the received packet so far. It should return true when enough bytes have been received
- * @param crcCheck - a function to check the CRC of the received bytes. It will return true with a correct match
  *
  */
-bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n, CheckFunction preambleCheck, CheckFunction lengthCheck, CheckFunction crcCheck);
+bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n);
 /**
  * Receive all bytes from the queue, or as many as is necessary to receive the packet
  * Assumes that the packet starts at the beginning of the queue
@@ -77,10 +74,8 @@ bool blueberryReceive(Bb* bb, ByteQ* q, uint32_t n, CheckFunction preambleCheck,
  * @param s - state for this routine to allow for multiple calls
  * @param q - the queue that the new bytes are coming from
  * @param n - the maximum number of bytes to process - this is to limit the type that this routine will take at one calling
- * @param startWordCheck - a function to test the start word of the packet. It will check only up to the Bb.length. It should return true so long as the start word is good
- * @param lengthCheck - a function to test the length of the received packet so far. It should return true when enough bytes have been received
  */
-bool blueberryReceiveAll(Bb* bb, ByteQ* q, CheckFunction preambleCheck, CheckFunction lengthCheck);
+bool blueberryReceiveAll(Bb* bb, ByteQ* q);
 /**
  * Free up data from the byte queue and prep the state
  */

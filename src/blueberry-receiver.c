@@ -25,6 +25,7 @@ THE SOFTWARE.
 //Includes
 //*******************************************************************************************
 #include <blueberry-receiver.h>
+#include <blueberry-transcoder.h>
 
 #include <stddef.h>
 
@@ -34,7 +35,11 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Defines
 //*******************************************************************************************
-
+#define PACKET_PREAMBLE (0x45554c42)
+#define PACKET_LENGTH_INDEX (4)
+#define PACKET_CRC_INDEX (6)
+#define PACKET_PREAMBLE_INDEX (0)
+#define PACKET_FIRST_MESSAGE_INDEX (8)
 //*******************************************************************************************
 //Types
 //*******************************************************************************************
@@ -42,11 +47,21 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Variables
 //*******************************************************************************************
-
 //*******************************************************************************************
 //Function Prototypes
 //*******************************************************************************************
-
+/**
+ * a function to test the start word of the packet. It will check only up to the Bb.length. It should return true so long as the start word is good
+ */
+static bool preambleCheck(Bb* bb);
+/**
+ * a function to test the length of the received packet so far. It should return true when enough bytes have been received
+ */
+static bool lengthCheck(Bb* bb);
+/**
+ * a function to check the CRC of the received bytes. It will return true with a correct match
+ */
+static bool crcCheck(Bb* bb);
 //*******************************************************************************************
 //Code
 //*******************************************************************************************
@@ -62,13 +77,10 @@ THE SOFTWARE.
  * @param inPacket - the buffer for this packet, also the state of the receive routine
  * @param q - the queue that the new bytes are coming from
  * @param n - the maximum number of bytes to process - this is to limit the type that this routine will take at one calling
- * @param startWordCheck - a function to test the start word of the packet. It will check only up to the Bb.length. It should return true so long as the start word is good
- * @param lengthCheck - a function to test the length of the received packet so far. It should return true when enough bytes have been received
- * @param crcCheck - a function to check the CRC of the received bytes. It will return true with a correct match
  * @return true if a valid packet was received
  *
  */
-bool blueberryReceive(Bb* inPacket, ByteQ* q, uint32_t n, CheckFunction preambleCheck, CheckFunction lengthCheck, CheckFunction crcCheck){
+bool blueberryReceive(Bb* inPacket, ByteQ* q, uint32_t n){
 	bool result = false;
 	bool fail = false;
 	if( inPacket->length == 0){
@@ -87,20 +99,22 @@ bool blueberryReceive(Bb* inPacket, ByteQ* q, uint32_t n, CheckFunction preamble
 	//cycle through all the bytes so far
 	for(uint32_t i = 0; i < m; ++i){
 
-		++(inPacket->length);
+		uint32_t j = ++(inPacket->length);
 
-		if(preambleCheck(inPacket)){
-			if(lengthCheck(inPacket)){
-				if(crcCheck(inPacket)){
-					result = true;
-					break;
-				} else {
-					fail = true;
-				}
+		if(j < PACKET_LENGTH_INDEX){
+			if(!preambleCheck(inPacket)){
+				fail = true;
 			}
-		} else {
-			fail = true;
+		} else if(lengthCheck(inPacket)){
+			if(crcCheck(inPacket)){
+				result = true;//we have a valid packet
+				break;
+				//any remaining bytes should be checked after this packet has been consumed
+			} else {
+				fail = true;
+			}
 		}
+
 		if(fail){
 			discardFromByteQ(q, inPacket->length);
 			inPacket->length = 0;
@@ -119,11 +133,9 @@ bool blueberryReceive(Bb* inPacket, ByteQ* q, uint32_t n, CheckFunction preamble
  * @param inPacket - the buffer for this packet, also the state of the receive routine
  * @param q - the queue that the new bytes are coming from
  * @param n - the maximum number of bytes to process - this is to limit the type that this routine will take at one calling
- * @param startWordCheck - a function to test the start word of the packet. It will check only up to the Bb.length. It should return true so long as the start word is good
- * @param lengthCheck - a function to test the length of the received packet so far. It should return true when enough bytes have been received and also populate the length field of the packet
  * @return true if a valid packet was received
  */
-bool blueberryReceiveAll(Bb* inPacket, ByteQ* q, CheckFunction startWordCheck, CheckFunction lengthCheck){
+bool blueberryReceiveAll(Bb* inPacket, ByteQ* q){
 	bool result = false;
 	inPacket->buffer = q->buffer;
 	inPacket->bufferLength = q->bufferSize;
@@ -132,7 +144,7 @@ bool blueberryReceiveAll(Bb* inPacket, ByteQ* q, CheckFunction startWordCheck, C
 
 	uint32_t n = getBytesUsed(q);
 	inPacket->length = n; //this field will eventually be set by the length check
-	if(startWordCheck(inPacket)){
+	if(preambleCheck(inPacket)){
 		if(lengthCheck(inPacket)){
 			result = true;
 		}
@@ -163,3 +175,33 @@ void blueberryReceiveDone(Bb* bb, ByteQ* q){
 }
 
 
+/**
+ * a function to test the start word of the packet. It will check only up to the Bb.length. It should return true so long as the start word is good
+ */
+static bool preambleCheck(Bb* bb){
+		uint32_t a = getBbUint32(bb, 0, PACKET_PREAMBLE_INDEX);
+		uint32_t b = PACKET_PREAMBLE;
+		uint32_t n = bb->length;
+		uint32_t i = n >= 4 ? 0 : 4 - n;
+		uint32_t m = 0xffffffff >> (i*8);
+		uint32_t r = (a ^ b) & m;
+		return r == 0;
+}
+/**
+ * a function to test the length of the received packet so far. It should return true when enough bytes have been received
+ */
+static bool lengthCheck(Bb* bb){
+	uint32_t len = getBbUint16(bb, 0, PACKET_LENGTH_INDEX);
+	uint32_t n = bb->length;
+
+	return n >= 6 && n >= len*4;
+}
+/**
+ * a function to check the CRC of the received bytes. It will return true with a correct match
+ */
+static bool crcCheck(Bb* bb){
+	uint32_t n = bb->length;
+	uint16_t crcA = (uint16_t)getBbUint16(bb, 0, PACKET_CRC_INDEX);
+	uint16_t crcB = computeCrc(bb, PACKET_FIRST_MESSAGE_INDEX, n);
+	return crcA == crcB;
+}
