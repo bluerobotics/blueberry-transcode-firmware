@@ -34,11 +34,19 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Includes
 //*******************************************************************************************
-
+#include <blueberry-transcoder.h>
 //*******************************************************************************************
 //Defines
 //*******************************************************************************************
+#define PACKET_PREAMBLE (0x45554c42)
+#define PACKET_LENGTH_INDEX (4)
+#define PACKET_CRC_INDEX (6)
+#define PACKET_PREAMBLE_INDEX (0)
+#define PACKET_FIRST_MESSAGE_INDEX (8)
 
+#define MESSAGE_LENGTH_INDEX (0)
+#define MESSAGE_KEY_INDEX (6)
+#define MODULE_KEY_INDEX (4)
 //*******************************************************************************************
 //Types
 //*******************************************************************************************
@@ -63,7 +71,7 @@ void parseBbPacket(Bb* buf);
 /**
  * registers a parser for a given message
  */
-void registerBbParser(uint16_t messageKey, BbParser parser);
+void registerBbParser(uint16_t moduleKey, uint16_t messageKey, BbParser parser);
 
 /**
  * Must be called at init

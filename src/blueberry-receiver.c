@@ -26,6 +26,7 @@ THE SOFTWARE.
 //*******************************************************************************************
 #include <blueberry-receiver.h>
 #include <blueberry-transcoder.h>
+#include <blueberry-parser.h>
 
 #include <stddef.h>
 
@@ -35,10 +36,7 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Defines
 //*******************************************************************************************
-#define PACKET_PREAMBLE (0x45554c42)
-#define PACKET_LENGTH_INDEX (4)
-#define PACKET_CRC_INDEX (6)
-#define PACKET_PREAMBLE_INDEX (0)
+
 
 //*******************************************************************************************
 //Types

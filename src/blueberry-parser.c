@@ -28,16 +28,19 @@ THE SOFTWARE.
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <queue.h>
 //*******************************************************************************************
 //Defines
 //*******************************************************************************************
 #define PARSER_NUM (100)
-#define MSG_RX_MAX (20)
+#define MSG_Q_SIZE (20)
+
+#define MAKE_KEY(mod, msg) ((((uint32_t)mod) << 16) | ((uint32_t)msg))
 //*******************************************************************************************
 //Types;
 //*******************************************************************************************
 typedef struct {
-	uint16_t key;
+	uint32_t key;
 	BbParser parser;
 } ParserKeyValue;
 
@@ -46,8 +49,9 @@ typedef struct {
 //*******************************************************************************************
 static ParserKeyValue m_parsers[PARSER_NUM];//the list of parsers. Will always be sorted by key
 static uint32_t m_totalNum = 0;
-static uint32_t m_rxKeys[MSG_RX_MAX];
-static uint32_t m_rxKeyCount = 0;
+static uint32_t m_rxQ[MSG_Q_SIZE];
+static uint32_t m_rxQFront = 0;
+static uint32_t m_rxQBack = 0;
 //*******************************************************************************************
 //Function Prototypes
 //*******************************************************************************************
@@ -57,7 +61,7 @@ static uint32_t m_rxKeyCount = 0;
  * @param index - a pointer to the resulting index value - this will indicate the index of the equal or first greater key value
  * @return - -1 if not found, else the index of the function pointer of the parser
  */
-static BbParser lookup(uint16_t key, uint32_t * index);
+static BbParser lookup(uint32_t key, uint32_t * index);
 //*******************************************************************************************
 //Code
 //*******************************************************************************************
@@ -77,17 +81,50 @@ void initBbParser(void){
  * This assumes that the buffer has been properly received and is at the start of the packet
  */
 void parseBbPacket(Bb* buf){
-	BbBlock msg =
+	uint32_t packetLength = getBbUint16(buf, 0, PACKET_LENGTH_INDEX);
+	if(packetLength == 0){
+		return;
+	}
+	BbBlock msg = PACKET_FIRST_MESSAGE_INDEX;
+	bool done = false;
+
+	while(!done){
+		uint16_t length = getBbUint16(buf, msg, MESSAGE_LENGTH_INDEX);
+		if(length == 0){
+			break;
+		}
+		uint16_t moduleKey = getBbUint16(buf, msg, MODULE_KEY_INDEX);
+		uint16_t messageKey = getBbUint16(buf, msg, MESSAGE_KEY_INDEX);
+		uint32_t k = MAKE_KEY(moduleKey, messageKey);
+		uint32_t i;
+		BbParser p = lookup(k, &i);
+		if(p != NULL){
+			(*p)(buf, msg);
+			m_rxQ[m_rxQBack] = k;
+			justAddedToQueueBack(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE);
+		}
+		msg += length;
+		if(msg >= packetLength){
+			done = true;
+		}
+	}
 }
 /**
  * registers a parser for a given message
+ * This will add a parser if module & key are new
+ * This will overwrite a parser if module & key already exist in the list
+ * Will fail silently if the list is full
  */
-void registerBbParser(uint16_t messageKey, BbParser parser){
+void registerBbParser(uint16_t moduleKey, uint16_t messageKey, BbParser parser){
+	if(m_totalNum >= PARSER_NUM){
+		return;
+	}
 	uint32_t i;
-	BbParser p = lookup(messageKey, &i);
+	uint32_t k = MAKE_KEY(moduleKey, messageKey);
+	BbParser p = lookup(k, &i);
 	if(p == NULL){
-		//we didn't find a match so make room
-		//move everything up from the ith location
+		//we didn't find a match so make room by
+		//moving everything up one, from the ith location to the end
 		for(uint32_t j = m_totalNum; j > i; --j){
 			ParserKeyValue * kvNew = &(m_parsers[j]);
 			ParserKeyValue * kvOld = &(m_parsers[j - 1]);
@@ -96,17 +133,18 @@ void registerBbParser(uint16_t messageKey, BbParser parser){
 		}
 		++m_totalNum;//we now have one more parser
 	}
-	m_parsers[i].key = messageKey;
+	m_parsers[i].key = k;
 	m_parsers[i].parser = parser;
 }
 
 /**
  * find the parser that is assigned to the specified key
- * @param key - the specified key
+ * @param key - the key to lookup
  * @param index - a pointer to the resulting index value - this will indicate the index of the equal or first greater key value
  * @return - -1 if not found, else the index of the function pointer of the parser
  */
-static BbParser lookup(uint16_t key, uint32_t * index){
+static BbParser lookup(uint32_t key, uint32_t * index){
+
 	BbParser result = NULL;
 	//use binary search to find parser
 	uint32_t min = 0;
@@ -122,7 +160,7 @@ static BbParser lookup(uint16_t key, uint32_t * index){
 			break;//we've converged but not matched
 		} else if(kv.key < key){
 			min = i + 1;//get the ith term out of the new range or we'll get stuck
-		} else {//if(kv.key > key){
+		} else {//if(kv.msgKey > msgKey){
 			max = i;//could discard the ith term but then we'd need to check for i being either zero or min, so don't bother
 		}
 	}
