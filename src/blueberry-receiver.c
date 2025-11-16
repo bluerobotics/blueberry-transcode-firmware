@@ -39,7 +39,7 @@ THE SOFTWARE.
 #define PACKET_LENGTH_INDEX (4)
 #define PACKET_CRC_INDEX (6)
 #define PACKET_PREAMBLE_INDEX (0)
-#define PACKET_FIRST_MESSAGE_INDEX (8)
+
 //*******************************************************************************************
 //Types
 //*******************************************************************************************
