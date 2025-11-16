@@ -26,11 +26,14 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Includes
 //*******************************************************************************************
-#include <byteQ.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <blueberry-transcoder.h>
+
 #include <blueberry-receiver.h>
+
+#include <bits/stdint-uintn.h>
+#include <byteQ.h>
+#include <stdbool.h>
+
+#include "blueberry-transcoder.h"
 
 //*******************************************************************************************
 //Defines
