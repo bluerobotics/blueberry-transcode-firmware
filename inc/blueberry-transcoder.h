@@ -175,7 +175,7 @@ BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock start, int i, int sequenceEle
  * Gets the number of elements of this sequence
  * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
  */
-uint32_t getBbSequenceLength(Bb* buf, Bbblock start, int i);
+uint32_t getBbSequenceLength(Bb* buf, BbBlock start, int i);
 /**
  * Gets the number of bytes for each element of a sequence
  * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
@@ -192,7 +192,7 @@ void setBbSequenceDataIndex(Bb* buf, BbBlock start, int i, uint16_t index);
  * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
  * @param length - the number of elements
  */
-uint32_t setBbSequenceLength(Bb* buf, Bbblock start, int i, uint32_t length);
+void setBbSequenceLength(Bb* buf, BbBlock start, int i, uint32_t length);
 
 
 
