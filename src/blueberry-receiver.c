@@ -86,14 +86,14 @@ bool blueberryReceive(Bb* inPacket, ByteQ* q, uint32_t n){
 	//cycle through all the bytes so far
 	for(uint32_t i = 0; i < m; ++i){
 
-		uint32_t j = ++(inPacket->length);
+		++(inPacket->length);
 
-		if(j < PACKET_LENGTH_INDEX){
-			if(!preambleCheck(inPacket)){
+		if(!minBbLengthCheck(inPacket)){
+			if(!checkBbPreamble(inPacket)){
 				fail = true;
 			}
-		} else if(lengthCheck(inPacket)){
-			if(crcCheck(inPacket)){
+		} else if(checkBbLength(inPacket)){
+			if(checkBbCrc(inPacket)){
 				result = true;//we have a valid packet
 				break;
 				//any remaining bytes should be checked after this packet has been consumed
@@ -131,9 +131,11 @@ bool blueberryReceiveAll(Bb* inPacket, ByteQ* q){
 
 	uint32_t n = getBytesUsed(q);
 	inPacket->length = n; //this field will eventually be set by the length check
-	if(preambleCheck(inPacket)){
-		if(lengthCheck(inPacket)){
-			result = true;
+	if(minBbLengthCheck(inPacket)){
+		if(checkBbPreamble(inPacket)){
+			if(checkBbLength(inPacket)){
+				result = true;
+			}
 		}
 	}
 

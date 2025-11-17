@@ -44,10 +44,18 @@ THE SOFTWARE.
 //*******************************************************************************************
 /**
  * A function pointer prototype for parsing a message
- * @param buf - the buffer containing the message
+ * @param bb - the buffer containing the message
  * @param msg - an index to the message to be parsed
  */
-typedef void (*BbParser)(Bb* buf, BbBlock msg);
+typedef void (*BbParser)(Bb* bb, BbBlock msg);
+
+/**
+ * A function pointer prototype for creating a message
+ * @param bb - the buffer that will contain the message
+ * @param msg - the block where the message shall be written
+ * @return - the next block after the new message is written
+ */
+typedef BbBlock (*BbBuilder)(Bb* bb, BbBlock msg);
 //*******************************************************************************************
 //Variables
 //*******************************************************************************************
@@ -73,22 +81,32 @@ void initBbParser(void);
 /**
  * a function to test the start word of the packet. It will check only up to the Bb.length. It should return true so long as the start word is good
  */
-bool preambleCheck(Bb* bb);
+bool checkBbPreamble(Bb* bb);
 /**
  * a function to test the length of the received packet so far. It should return true when enough bytes have been received
  */
-bool lengthCheck(Bb* bb);
+bool checkBbLength(Bb* bb);
 /**
  * a function to check the CRC of the received bytes. It will return true with a correct match
  */
-bool crcCheck(Bb* bb);
+bool checkBbCrc(Bb* bb);
 
 /**
- * sets up the header for a packet and returns the block for the first message
+ * does any preliminary header setup and computes the locationo for the starting message
  */
-BbBlock startPacket(Bb* bb);
+BbBlock startBbPacket(Bb* bb);
 
+/**
+ * Finalize the packet in preparation for sending
+ * This relies on the buffer having the final length set correctly
+ * And all messages construted correctly
+ */
+void finishBbPacket(Bb* bb);
 
+/**
+ * checks if a potential packet has at least enough bytes received to contain a packet header
+ */
+bool minBbLengthCheck(Bb* bb);
 
 //*******************************************************************************************
 //Code

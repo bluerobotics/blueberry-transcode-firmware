@@ -109,7 +109,10 @@ void parseBbPacket(Bb* buf){
 		uint32_t i;
 		BbParser p = lookup(k, &i);
 		if(p != NULL){
+			//call the parser function
 			(*p)(buf, msg);
+
+			//record in the queue that the particular type of message was received
 			m_rxQ[m_rxQBack] = k;
 			justAddedToQueueBack(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE);
 		}
@@ -176,16 +179,17 @@ static BbParser lookup(uint32_t key, uint32_t * index){
 	}
 	*index = i;
 	return result;
-
-
-
-
 }
-
+/**
+ * checks if a potential packet has at least enough bytes received to contain a packet header
+ */
+bool minBbLengthCheck(Bb* bb){
+	return bb->length >= PACKET_FIRST_MESSAGE_INDEX;
+}
 /**
  * a function to test the start word of the packet. It will check only up to the Bb.length. It should return true so long as the start word is good
  */
-bool preambleCheck(Bb* bb){
+bool checkBbPreamble(Bb* bb){
 		uint32_t a = getBbUint32(bb, 0, PACKET_PREAMBLE_INDEX);
 		uint32_t b = PACKET_PREAMBLE;
 		uint32_t n = bb->length;
@@ -197,7 +201,7 @@ bool preambleCheck(Bb* bb){
 /**
  * a function to test the length of the received packet so far. It should return true when enough bytes have been received
  */
-bool lengthCheck(Bb* bb){
+bool checkBbLength(Bb* bb){
 	uint32_t len = getBbUint16(bb, 0, PACKET_LENGTH_INDEX);
 	uint32_t n = bb->length;
 
@@ -206,7 +210,7 @@ bool lengthCheck(Bb* bb){
 /**
  * a function to check the CRC of the received bytes. It will return true with a correct match
  */
-bool crcCheck(Bb* bb){
+bool checkBbCrc(Bb* bb){
 	uint32_t n = bb->length;
 	uint16_t crcA = (uint16_t)getBbUint16(bb, 0, PACKET_CRC_INDEX);
 	uint16_t crcB = computeCrc(bb, PACKET_FIRST_MESSAGE_INDEX, n);
@@ -214,11 +218,23 @@ bool crcCheck(Bb* bb){
 }
 
 /**
- * sets up the header for a packet and returns the block for the first message
+ * does any preliminary header setup and computes the locationo for the starting message
  */
-BbBlock startPacket(Bb* bb){
-	setBbUint32(bb, 0, 0, PACKET_PREAMBLE);
-	setBbUint16(bb, 0, PACKET_CRC_INDEX, 0xffff);
-	setBbUint16(bb, 0, PACKET_LENGTH_INDEX, 0);
+BbBlock startBbPacket(Bb* bb){
+//	setBbUint32(bb, 0, 0, PACKET_PREAMBLE);
+//	setBbUint16(bb, 0, PACKET_CRC_INDEX, 0xffff);
+//	setBbUint16(bb, 0, PACKET_LENGTH_INDEX, 0);
 	return PACKET_FIRST_MESSAGE_INDEX;
+}
+/**
+ * Finalize the packet in preparation for sending
+ * This relies on the buffer having the final length set correctly
+ * And all messages construted correctly
+ */
+void finishBbPacket(Bb* bb){
+	uint32_t n = bb->length;
+	setBbUint32(bb, 0, 0, PACKET_PREAMBLE);
+	setBbUint16(bb, 0, PACKET_LENGTH_INDEX, (uint16_t)(n/4));
+	uint16_t crc = computeCrc(bb, PACKET_FIRST_MESSAGE_INDEX, n);
+	setBbUint16(bb, 0, PACKET_CRC_INDEX, crc);
 }
