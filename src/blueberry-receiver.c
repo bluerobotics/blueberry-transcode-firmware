@@ -48,18 +48,7 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Function Prototypes
 //*******************************************************************************************
-/**
- * a function to test the start word of the packet. It will check only up to the Bb.length. It should return true so long as the start word is good
- */
-static bool preambleCheck(Bb* bb);
-/**
- * a function to test the length of the received packet so far. It should return true when enough bytes have been received
- */
-static bool lengthCheck(Bb* bb);
-/**
- * a function to check the CRC of the received bytes. It will return true with a correct match
- */
-static bool crcCheck(Bb* bb);
+
 //*******************************************************************************************
 //Code
 //*******************************************************************************************
@@ -173,33 +162,4 @@ void blueberryReceiveDone(Bb* bb, ByteQ* q){
 }
 
 
-/**
- * a function to test the start word of the packet. It will check only up to the Bb.length. It should return true so long as the start word is good
- */
-static bool preambleCheck(Bb* bb){
-		uint32_t a = getBbUint32(bb, 0, PACKET_PREAMBLE_INDEX);
-		uint32_t b = PACKET_PREAMBLE;
-		uint32_t n = bb->length;
-		uint32_t i = n >= 4 ? 0 : 4 - n;
-		uint32_t m = 0xffffffff >> (i*8);
-		uint32_t r = (a ^ b) & m;
-		return r == 0;
-}
-/**
- * a function to test the length of the received packet so far. It should return true when enough bytes have been received
- */
-static bool lengthCheck(Bb* bb){
-	uint32_t len = getBbUint16(bb, 0, PACKET_LENGTH_INDEX);
-	uint32_t n = bb->length;
 
-	return n >= 6 && n >= len*4;
-}
-/**
- * a function to check the CRC of the received bytes. It will return true with a correct match
- */
-static bool crcCheck(Bb* bb){
-	uint32_t n = bb->length;
-	uint16_t crcA = (uint16_t)getBbUint16(bb, 0, PACKET_CRC_INDEX);
-	uint16_t crcB = computeCrc(bb, PACKET_FIRST_MESSAGE_INDEX, n);
-	return crcA == crcB;
-}

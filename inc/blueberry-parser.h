@@ -38,15 +38,7 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Defines
 //*******************************************************************************************
-#define PACKET_PREAMBLE (0x45554c42)
-#define PACKET_LENGTH_INDEX (4)
-#define PACKET_CRC_INDEX (6)
-#define PACKET_PREAMBLE_INDEX (0)
-#define PACKET_FIRST_MESSAGE_INDEX (8)
 
-#define MESSAGE_LENGTH_INDEX (0)
-#define MESSAGE_KEY_INDEX (6)
-#define MODULE_KEY_INDEX (4)
 //*******************************************************************************************
 //Types
 //*******************************************************************************************
@@ -77,6 +69,24 @@ void registerBbParser(uint16_t moduleKey, uint16_t messageKey, BbParser parser);
  * Must be called at init
  */
 void initBbParser(void);
+
+/**
+ * a function to test the start word of the packet. It will check only up to the Bb.length. It should return true so long as the start word is good
+ */
+bool preambleCheck(Bb* bb);
+/**
+ * a function to test the length of the received packet so far. It should return true when enough bytes have been received
+ */
+bool lengthCheck(Bb* bb);
+/**
+ * a function to check the CRC of the received bytes. It will return true with a correct match
+ */
+bool crcCheck(Bb* bb);
+
+/**
+ * sets up the header for a packet and returns the block for the first message
+ */
+BbBlock startPacket(Bb* bb);
 
 
 

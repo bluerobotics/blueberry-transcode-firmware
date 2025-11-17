@@ -36,6 +36,16 @@ THE SOFTWARE.
 #define MSG_Q_SIZE (20)
 
 #define MAKE_KEY(mod, msg) ((((uint32_t)mod) << 16) | ((uint32_t)msg))
+
+#define PACKET_PREAMBLE (0x45554c42)
+#define PACKET_LENGTH_INDEX (4)
+#define PACKET_CRC_INDEX (6)
+#define PACKET_PREAMBLE_INDEX (0)
+#define PACKET_FIRST_MESSAGE_INDEX (8)
+
+#define MESSAGE_LENGTH_INDEX (0)
+#define MESSAGE_KEY_INDEX (6)
+#define MODULE_KEY_INDEX (4)
 //*******************************************************************************************
 //Types;
 //*******************************************************************************************
@@ -170,4 +180,45 @@ static BbParser lookup(uint32_t key, uint32_t * index){
 
 
 
+}
+
+/**
+ * a function to test the start word of the packet. It will check only up to the Bb.length. It should return true so long as the start word is good
+ */
+bool preambleCheck(Bb* bb){
+		uint32_t a = getBbUint32(bb, 0, PACKET_PREAMBLE_INDEX);
+		uint32_t b = PACKET_PREAMBLE;
+		uint32_t n = bb->length;
+		uint32_t i = n >= 4 ? 0 : 4 - n;
+		uint32_t m = 0xffffffff >> (i*8);
+		uint32_t r = (a ^ b) & m;
+		return r == 0;
+}
+/**
+ * a function to test the length of the received packet so far. It should return true when enough bytes have been received
+ */
+bool lengthCheck(Bb* bb){
+	uint32_t len = getBbUint16(bb, 0, PACKET_LENGTH_INDEX);
+	uint32_t n = bb->length;
+
+	return n >= 6 && n >= len*4;
+}
+/**
+ * a function to check the CRC of the received bytes. It will return true with a correct match
+ */
+bool crcCheck(Bb* bb){
+	uint32_t n = bb->length;
+	uint16_t crcA = (uint16_t)getBbUint16(bb, 0, PACKET_CRC_INDEX);
+	uint16_t crcB = computeCrc(bb, PACKET_FIRST_MESSAGE_INDEX, n);
+	return crcA == crcB;
+}
+
+/**
+ * sets up the header for a packet and returns the block for the first message
+ */
+BbBlock startPacket(Bb* bb){
+	setBbUint32(bb, 0, 0, PACKET_PREAMBLE);
+	setBbUint16(bb, 0, PACKET_CRC_INDEX, 0xffff);
+	setBbUint16(bb, 0, PACKET_LENGTH_INDEX, 0);
+	return PACKET_FIRST_MESSAGE_INDEX;
 }
