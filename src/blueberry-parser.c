@@ -45,6 +45,8 @@ THE SOFTWARE.
 
 #define MESSAGE_LENGTH_INDEX (0)
 #define MESSAGE_KEY_INDEX (6)
+#define MESSAGE_FIRST_DATA (8)
+
 #define MODULE_KEY_INDEX (4)
 //*******************************************************************************************
 //Types;
@@ -106,11 +108,14 @@ void parseBbPacket(Bb* buf){
 		uint16_t moduleKey = getBbUint16(buf, msg, MODULE_KEY_INDEX);
 		uint16_t messageKey = getBbUint16(buf, msg, MESSAGE_KEY_INDEX);
 		uint32_t k = MAKE_KEY(moduleKey, messageKey);
+		uint16_t len = getBbUint16(buf, msg, MESSAGE_LENGTH_INDEX);
 		uint32_t i;
 		BbParser p = lookup(k, &i);
 		if(p != NULL){
-			//call the parser function
-			(*p)(buf, msg);
+			//call the parser function if there's message data
+			if(len >= MESSAGE_FIRST_DATA){
+				(*p)(buf, msg);
+			}
 
 			//record in the queue that the particular type of message was received
 			m_rxQ[m_rxQBack] = k;
