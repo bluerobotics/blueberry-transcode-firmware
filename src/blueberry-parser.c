@@ -44,10 +44,11 @@ THE SOFTWARE.
 #define PACKET_FIRST_MESSAGE_INDEX (8)
 
 #define MESSAGE_LENGTH_INDEX (0)
-#define MESSAGE_KEY_INDEX (6)
+#define MODULE_MESSAGE_KEY_INDEX (4)
+
 #define MESSAGE_FIRST_DATA (8)
 
-#define MODULE_KEY_INDEX (4)
+
 //*******************************************************************************************
 //Types;
 //*******************************************************************************************
@@ -105,9 +106,8 @@ void parseBbPacket(Bb* buf){
 		if(length == 0){
 			break;
 		}
-		uint16_t moduleKey = getBbUint16(buf, msg, MODULE_KEY_INDEX);
-		uint16_t messageKey = getBbUint16(buf, msg, MESSAGE_KEY_INDEX);
-		uint32_t k = MAKE_KEY(moduleKey, messageKey);
+		uint32_t k = getBbUint32(buf, msg, MODULE_MESSAGE_KEY_INDEX);
+
 		uint16_t len = getBbUint16(buf, msg, MESSAGE_LENGTH_INDEX);
 		uint32_t i;
 		BbParser p = lookup(k, &i);
@@ -133,12 +133,12 @@ void parseBbPacket(Bb* buf){
  * This will overwrite a parser if module & key already exist in the list
  * Will fail silently if the list is full
  */
-void registerBbParser(uint16_t moduleKey, uint16_t messageKey, BbParser parser){
+void registerBbParser(uint32_t moduleMessageKey, BbParser parser){
 	if(m_totalNum >= PARSER_NUM){
 		return;
 	}
 	uint32_t i;
-	uint32_t k = MAKE_KEY(moduleKey, messageKey);
+	uint32_t k = moduleMessageKey;
 	BbParser p = lookup(k, &i);
 	if(p == NULL){
 		//we didn't find a match so make room by
@@ -223,7 +223,7 @@ bool checkBbCrc(Bb* bb){
 }
 
 /**
- * does any preliminary header setup and computes the locationo for the starting message
+ * does any preliminary header setup and computes the location for the starting message
  */
 BbBlock startBbPacket(Bb* bb){
 //	setBbUint32(bb, 0, 0, PACKET_PREAMBLE);

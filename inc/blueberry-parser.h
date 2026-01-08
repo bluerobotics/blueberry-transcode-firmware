@@ -71,7 +71,7 @@ void parseBbPacket(Bb* buf);
 /**
  * registers a parser for a given message
  */
-void registerBbParser(uint16_t moduleKey, uint16_t messageKey, BbParser parser);
+void registerBbParser(uint32_t moduleMessageKey, BbParser parser);
 
 /**
  * Must be called at init
