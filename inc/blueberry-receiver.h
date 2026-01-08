@@ -42,12 +42,6 @@ THE SOFTWARE.
 //*******************************************************************************************
 
 
-/**
- * a function pointer definition for checking the received packet
- * It takes one parameter: the struct for the received data.
- * It assumes the length member of the struct indicates the current number of bytes received
- */
-typedef bool (*CheckFunction)(Bb*);
 
 //*******************************************************************************************
 //Variables
