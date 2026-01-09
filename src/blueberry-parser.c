@@ -43,8 +43,10 @@ THE SOFTWARE.
 #define PACKET_PREAMBLE_INDEX (0)
 #define PACKET_FIRST_MESSAGE_INDEX (8)
 
-#define MESSAGE_LENGTH_INDEX (0)
-#define MODULE_MESSAGE_KEY_INDEX (4)
+
+#define MODULE_MESSAGE_KEY_INDEX (0)
+#define MESSAGE_LENGTH_INDEX (4)
+#define MESSAGE_MAX_ORDINAL_INDEX (6)
 
 #define MESSAGE_FIRST_DATA (8)
 
@@ -94,37 +96,34 @@ void initBbParser(void){
  * This assumes that the buffer has been properly received and is at the start of the packet
  */
 void parseBbPacket(Bb* buf){
-	uint32_t packetLength = getBbUint16(buf, 0, PACKET_LENGTH_INDEX);
+	uint32_t packetLength = getBbUint16(buf, 0, PACKET_LENGTH_INDEX)*4;
 	if(packetLength == 0){
 		return;
 	}
 	BbBlock msg = PACKET_FIRST_MESSAGE_INDEX;
-	bool done = false;
 
-	while(!done){
+	while(msg < packetLength){
 		uint16_t length = getBbUint16(buf, msg, MESSAGE_LENGTH_INDEX);
-		if(length == 0){
+		if(length < MESSAGE_FIRST_DATA){
+			//this seems malformed so quite parsing packet
 			break;
-		}
-		uint32_t k = getBbUint32(buf, msg, MODULE_MESSAGE_KEY_INDEX);
+		} else {
+			//we have enough data for a message
+			uint32_t k = getBbUint32(buf, msg, MODULE_MESSAGE_KEY_INDEX);
 
-		uint16_t len = getBbUint16(buf, msg, MESSAGE_LENGTH_INDEX);
-		uint32_t i;
-		BbParser p = lookup(k, &i);
-		if(p != NULL){
-			//call the parser function if there's message data
-			if(len >= MESSAGE_FIRST_DATA){
+			uint32_t i;
+			BbParser p = lookup(k, &i);
+			if(p != NULL){
+				//call the parser
 				(*p)(buf, msg);
-			}
 
-			//record in the queue that the particular type of message was received
-			m_rxQ[m_rxQBack] = k;
-			justAddedToQueueBack(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE);
+				//record in the queue that the particular type of message was received
+				m_rxQ[m_rxQBack] = k;
+				justAddedToQueueBack(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE);
+			}
 		}
 		msg += length;
-		if(msg >= packetLength){
-			done = true;
-		}
+
 	}
 }
 /**
@@ -166,7 +165,7 @@ static BbParser lookup(uint32_t key, uint32_t * index){
 	BbParser result = NULL;
 	//use binary search to find parser
 	uint32_t min = 0;
-	uint32_t max = m_totalNum;//this will be one past the last element of the list
+	uint32_t max = m_totalNum == 0 ? 0 : m_totalNum - 1;//this will be one past the last element of the list
 	uint32_t i;
 	while(true){
 		i = min + max / 2;//i will be greater than or equal to i because of the integer math
@@ -177,6 +176,10 @@ static BbParser lookup(uint32_t key, uint32_t * index){
 		} else if(min == max){
 			break;//we've converged but not matched
 		} else if(kv.key < key){
+			if(i == max){
+				//we didn't find it
+				break;
+			}
 			min = i + 1;//get the ith term out of the new range or we'll get stuck
 		} else {//if(kv.msgKey > msgKey){
 			max = i;//could discard the ith term but then we'd need to check for i being either zero or min, so don't bother
@@ -226,9 +229,10 @@ bool checkBbCrc(Bb* bb){
  * does any preliminary header setup and computes the location for the starting message
  */
 BbBlock startBbPacket(Bb* bb){
-//	setBbUint32(bb, 0, 0, PACKET_PREAMBLE);
+	setBbUint32(bb, 0, 0, PACKET_PREAMBLE);
 //	setBbUint16(bb, 0, PACKET_CRC_INDEX, 0xffff);
 //	setBbUint16(bb, 0, PACKET_LENGTH_INDEX, 0);
+	bb->length = PACKET_FIRST_MESSAGE_INDEX;
 	return PACKET_FIRST_MESSAGE_INDEX;
 }
 /**
@@ -238,8 +242,25 @@ BbBlock startBbPacket(Bb* bb){
  */
 void finishBbPacket(Bb* bb){
 	uint32_t n = bb->length;
-	setBbUint32(bb, 0, 0, PACKET_PREAMBLE);
+//	setBbUint32(bb, 0, 0, PACKET_PREAMBLE);
 	setBbUint16(bb, 0, PACKET_LENGTH_INDEX, (uint16_t)(n/4));
 	uint16_t crc = computeCrc(bb, PACKET_FIRST_MESSAGE_INDEX, n);
 	setBbUint16(bb, 0, PACKET_CRC_INDEX, crc);
 }
+
+/**
+ * gets the module/message key from the specified message
+ */
+uint32_t getBbMessageKey(Bb* bb, BbBlock msg){
+	return getBbUint32(bb, msg, MODULE_MESSAGE_KEY_INDEX);
+}
+/**
+ * gets the max ordinal field from the specified message
+ * This is the ordinal of the last field of the specified message.
+ * This is useful to tell if the message was populated as expected or if it lacks a few fields, as might happen if it was constructed by an older version of the protocol
+ */
+uint8_t getBbMessageMaxOrdinal(Bb* bb, BbBlock msg){
+	return getBbUint8(bb, msg, MESSAGE_MAX_ORDINAL_INDEX);
+}
+
+

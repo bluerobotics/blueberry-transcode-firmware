@@ -108,6 +108,17 @@ void finishBbPacket(Bb* bb);
  */
 bool minBbLengthCheck(Bb* bb);
 
+/**
+ * gets the module/message key from the specified message
+ */
+uint32_t getBbMessageKey(Bb* bb, BbBlock msg);
+/**
+ * gets the max ordinal field from the specified message
+ * This is the ordinal of the last field of the specified message.
+ * This is useful to tell if the message was populated as expected or if it lacks a few fields, as might happen if it was constructed by an older version of the protocol
+ */
+uint8_t getBbMessageMaxOrdinal(Bb* bb, BbBlock msg);
+
 //*******************************************************************************************
 //Code
 //*******************************************************************************************
