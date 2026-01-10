@@ -1,0 +1,67 @@
+/*
+Copyright (c) 2026 Blue Robotics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+
+//********************************************************************************
+//includes
+//********************************************************************************
+
+
+//********************************************************************************
+//defines
+//********************************************************************************
+#define MODULE_MESSAGE_KEY_INDEX (0)
+#define MESSAGE_LENGTH_INDEX (4)
+#define MESSAGE_MAX_ORDINAL_INDEX (6)
+
+#define MESSAGE_FIRST_DATA (8)
+
+//********************************************************************************
+//types
+//********************************************************************************
+
+//********************************************************************************
+//variables
+//********************************************************************************
+
+//********************************************************************************
+//function prototypes
+//********************************************************************************
+
+//********************************************************************************
+//code
+//********************************************************************************
+
+/**
+ * gets the module/message key from the specified message
+ */
+uint32_t getBbMessageKey(Bb* bb, BbBlock msg){
+	return getBbUint32(bb, msg, MODULE_MESSAGE_KEY_INDEX);
+}
+/**
+ * gets the max ordinal field from the specified message
+ * This is the ordinal of the last field of the specified message.
+ * This is useful to tell if the message was populated as expected or if it lacks a few fields, as might happen if it was constructed by an older version of the protocol
+ */
+uint8_t getBbMessageMaxOrdinal(Bb* bb, BbBlock msg){
+	return getBbUint8(bb, msg, MESSAGE_MAX_ORDINAL_INDEX);
+}

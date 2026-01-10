@@ -25,6 +25,7 @@ THE SOFTWARE.
 //Includes
 //*******************************************************************************************
 #include <blueberry-parser.h>
+#include <blueberry-message.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
