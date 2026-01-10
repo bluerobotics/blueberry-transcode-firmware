@@ -160,42 +160,39 @@ uint32_t bbWrap(Bb* buf, int i);
  */
 uint16_t computeCrc(Bb* buf, BbBlock start, BbBlock end);
 
-/**
- * Gets the number of bytes for each element of a sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- */
-uint16_t getBbSequenceElementByteCount(Bb* buf, BbBlock start, int i);
-/**
- * Gets a new block index for the specified sequence element
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- * @param sequenceElement - the index of the sequence element
- */
-BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock start, int i, int sequenceElement);
-/**
- * Gets the number of elements of this sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- */
-uint32_t getBbSequenceLength(Bb* buf, BbBlock start, int i);
-/**
- * Gets the number of bytes for each element of a sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- * @param count - the number of bytes for each element of a sequence
- */
-void setBbSequenceElementByteCount(Bb* buf, BbBlock start, int i, uint16_t count);
-/**Sets the number of bytes for each element of a sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- * @param index - the number of bytes for each element of a sequence
- */
-void setBbSequenceBlockIndex(Bb* buf, BbBlock start, int i, uint16_t index);
-/**
- * Sets the number of elements of this sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- * @param length - the number of elements
- */
-void setBbSequenceLength(Bb* buf, BbBlock start, int i, uint32_t length);
 
 
+/**
+ * Gets the index for the specified sequence element. this can be used to read or write from the specified sequence element
+ * @param buf - the buffer containing the data packet, message, etc.
+ * @param block - the beginning of the packet, message, sequence, etc. that we are currently interrogating
+ * @param i - the index (in bytes) of the sequence placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
+ * @param sequenceElement - the index of the sequence element. This must be smaller than the sequence length - but this is not checked here.
+ */
+BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock block, uint32_t i, uint32_t sequenceElement);
 
+/**
+ * Initializes the sequence placeholder and sequence length with the required information
+ * @param buf - the buffer containing the data packet, message, etc.
+ * @param block - the beginning of the packet, message, sequence, etc. that we are currently interrogating
+ * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
+ * @param elementByteNum - the number of bytes used by each sequence element
+ * @param elementNum - the number of elements of the sequence
+ * @return the block in the buffer containing the sequence data
+
+ */
+BbBlock initBbSequence(Bb* buf, BbBlock block, uint32_t i, uint32_t elementByteNum, uint32_t elementNum);
+
+
+/**
+ * Gets the specified element of the array, as a block index
+ * @param buf - the buffer containing the data packet, message, etc.
+ * @param block - the beginning of the packet, message, sequence, etc. that we are currently interrogating
+ * @param i - the index (in bytes) of the start of the array (which corresponds to the first element)
+ * @param arrayElement - the item of the array that we want
+ * @param arrayElementLength - the length in bytes of each array element
+ */
+BbBlock getBbArrayElementIndex(Bb* buf, BbBlock block, uint32_t i, uint32_t arrayElement, uint32_t arrayElementLength);
 
 
 //*******************************************************************************************
