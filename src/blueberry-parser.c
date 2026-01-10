@@ -99,13 +99,13 @@ void parseBbPacket(Bb* buf){
 	BbBlock msg = PACKET_FIRST_MESSAGE_INDEX;
 
 	while(msg < packetLength){
-		uint16_t length = getBbUint16(buf, msg, MESSAGE_LENGTH_INDEX);
-		if(length < MESSAGE_FIRST_DATA){
+
+		if(isBbMessageEmpty(buf, msg)){
 			//this seems malformed so quite parsing packet
 			break;
 		} else {
 			//we have enough data for a message
-			uint32_t k = getBbUint32(buf, msg, MODULE_MESSAGE_KEY_INDEX);
+			uint32_t k = getBbMessageKey(buf, msg);
 
 			uint32_t i;
 			BbParser p = lookup(k, &i);
@@ -118,7 +118,7 @@ void parseBbPacket(Bb* buf){
 				justAddedToQueueBack(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE);
 			}
 		}
-		msg += length;
+		msg += getBbMessageLength(buf, msg);
 
 	}
 }
