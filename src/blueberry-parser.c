@@ -44,11 +44,6 @@ THE SOFTWARE.
 #define PACKET_FIRST_MESSAGE_INDEX (8)
 
 
-#define MODULE_MESSAGE_KEY_INDEX (0)
-#define MESSAGE_LENGTH_INDEX (4)
-#define MESSAGE_MAX_ORDINAL_INDEX (6)
-
-#define MESSAGE_FIRST_DATA (8)
 
 
 //*******************************************************************************************
@@ -248,19 +243,6 @@ void finishBbPacket(Bb* bb){
 	setBbUint16(bb, 0, PACKET_CRC_INDEX, crc);
 }
 
-/**
- * gets the module/message key from the specified message
- */
-uint32_t getBbMessageKey(Bb* bb, BbBlock msg){
-	return getBbUint32(bb, msg, MODULE_MESSAGE_KEY_INDEX);
-}
-/**
- * gets the max ordinal field from the specified message
- * This is the ordinal of the last field of the specified message.
- * This is useful to tell if the message was populated as expected or if it lacks a few fields, as might happen if it was constructed by an older version of the protocol
- */
-uint8_t getBbMessageMaxOrdinal(Bb* bb, BbBlock msg){
-	return getBbUint8(bb, msg, MESSAGE_MAX_ORDINAL_INDEX);
-}
+
 
 
