@@ -186,7 +186,7 @@ void setBbSequenceElementByteCount(Bb* buf, BbBlock start, int i, uint16_t count
  * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
  * @param index - the number of bytes for each element of a sequence
  */
-void setBbSequenceDataIndex(Bb* buf, BbBlock start, int i, uint16_t index);
+void setBbSequenceBlockIndex(Bb* buf, BbBlock start, int i, uint16_t index);
 /**
  * Sets the number of elements of this sequence
  * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
