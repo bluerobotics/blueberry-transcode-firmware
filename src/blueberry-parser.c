@@ -118,7 +118,8 @@ void parseBbPacket(Bb* buf){
 				justAddedToQueueBack(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE);
 			}
 		}
-		msg += getBbMessageLength(buf, msg);
+		uint32_t len = getBbMessageLength(buf, msg);
+		msg += len;
 
 	}
 }
@@ -152,6 +153,7 @@ void registerBbParser(uint32_t moduleMessageKey, BbParser parser){
 
 /**
  * find the parser that is assigned to the specified key
+ * or find the position where the specified key might be placed in the list if it is not there
  * @param key - the key to lookup
  * @param index - a pointer to the resulting index value - this will indicate the index of the equal or first greater key value
  * @return - -1 if not found, else the index of the function pointer of the parser
@@ -163,22 +165,34 @@ static BbParser lookup(uint32_t key, uint32_t * index){
 	uint32_t min = 0;
 	uint32_t max = m_totalNum == 0 ? 0 : m_totalNum - 1;//this will be one past the last element of the list
 	uint32_t i;
+	uint32_t ikey = 0;
 	while(true){
-		i = min + max / 2;//i will be greater than or equal to i because of the integer math
+		i = (min + max) / 2;//i will be greater than or equal to i because of the integer math
 		ParserKeyValue kv = m_parsers[i];
-		if(kv.key == key){
+		ikey = kv.key;
+
+		if(ikey == key){
 			result = kv.parser;
 			break;
-		} else if(min == max){
-			break;//we've converged but not matched
-		} else if(kv.key < key){
-			if(i == max){
-				//we didn't find it
+		} else if(ikey < key){
+			//the key in the list is less than the search key
+			++i;//advance to the next spot
+			if(i > max){
+				//we're already at the end of the list so
 				break;
 			}
-			min = i + 1;//get the ith term out of the new range or we'll get stuck
-		} else {//if(kv.msgKey > msgKey){
-			max = i;//could discard the ith term but then we'd need to check for i being either zero or min, so don't bother
+			min = i;//constrain the range based on the latest test
+		} else {
+			//the key in the list is greater than the search key
+			//so the right answer probably lives below this one
+			if(i <= min || min == max){
+				//if we're at the minimum of the range or the range has shrunk to 0 then I guess we're done.
+				break;
+			}
+			//the current location is too big so move to the next smaller one
+			//and constrain the range accordingly
+			--i;
+			max = i;
 		}
 	}
 	*index = i;

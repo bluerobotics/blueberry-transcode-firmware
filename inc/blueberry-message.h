@@ -104,6 +104,16 @@ BbBlock getBbArrayElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t arrayE
  */
 bool isBbMessageEmpty(Bb* buf, BbBlock msg);
 
+/**
+ * Gets the index for the specified sequence element. , relative to the specified message.
+ * This can be used to read or write from the specified sequence element
+ * @param buf - the buffer containing the data packet, message, etc.
+ * @param msg - the index of the beginning of the message
+ * @param i - the index (in bytes) of the sequence placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
+ */
+uint32_t getBbSequenceElementNum(Bb* buf, BbBlock msg, uint32_t i);
+
+
 //*******************************************************************************************
 //Code
 //*******************************************************************************************
