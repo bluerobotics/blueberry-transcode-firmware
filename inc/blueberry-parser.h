@@ -43,19 +43,14 @@ THE SOFTWARE.
 //Types
 //*******************************************************************************************
 /**
- * A function pointer prototype for parsing a message
- * @param bb - the buffer containing the message
- * @param msg - an index to the message to be parsed
+ * A function pointer prototype for processing a message
+ * These are either used for parsing a message or building a message
+ * @param bb - the buffer containing or to contain the message
+ * @param msg - an index to the start of the message to be parsed or built
  */
-typedef void (*BbParser)(Bb* bb, BbBlock msg);
+typedef void (*BbProcessor)(Bb* bb, BbBlock msg);
 
-/**
- * A function pointer prototype for creating a message
- * @param bb - the buffer that will contain the message
- * @param msg - the block where the message shall be written
- * @return - the next block after the new message is written
- */
-typedef BbBlock (*BbBuilder)(Bb* bb, BbBlock msg);
+
 //*******************************************************************************************
 //Variables
 //*******************************************************************************************
@@ -71,7 +66,12 @@ void parseBbPacket(Bb* buf);
 /**
  * registers a parser for a given message
  */
-void registerBbParser(uint32_t moduleMessageKey, BbParser parser);
+void registerBbParser(uint32_t moduleMessageKey, BbProcessor parser);
+
+/**
+ * register a message processor for adding a message to a buffer
+ */
+void registerBbBuilder(uint32_t moduleMessageKey, BbProcessor builder);
 
 /**
  * Must be called at init

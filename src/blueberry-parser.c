@@ -33,7 +33,7 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Defines
 //*******************************************************************************************
-#define PARSER_NUM (100)
+#define PROCESSOR_NUM (100)
 #define MSG_Q_SIZE (20)
 
 #define MAKE_KEY(mod, msg) ((((uint32_t)mod) << 16) | ((uint32_t)msg))
@@ -52,14 +52,19 @@ THE SOFTWARE.
 //*******************************************************************************************
 typedef struct {
 	uint32_t key;
-	BbParser parser;
-} ParserKeyValue;
+	BbProcessor parser;
+} ProcessorKeyValue;
+
+typedef struct {
+	ProcessorKeyValue m_processors[PROCESSOR_NUM];
+	uint32_t num;
+} Processors;
 
 //*******************************************************************************************
 //Variables
 //*******************************************************************************************
-static ParserKeyValue m_parsers[PARSER_NUM];//the list of parsers. Will always be sorted by key
-static uint32_t m_totalNum = 0;
+static Processors m_parsers;
+static Processors m_builders;
 static uint32_t m_rxQ[MSG_Q_SIZE];
 static uint32_t m_rxQFront = 0;
 static uint32_t m_rxQBack = 0;
@@ -72,7 +77,8 @@ static uint32_t m_rxQBack = 0;
  * @param index - a pointer to the resulting index value - this will indicate the index of the equal or first greater key value
  * @return - -1 if not found, else the index of the function pointer of the parser
  */
-static BbParser lookup(uint32_t key, uint32_t * index);
+static BbProcessor lookup(Processors * ps, uint32_t key, uint32_t * index);
+static void registerProcessor(Processors * ps, uint32_t key, BbProcessor p);
 //*******************************************************************************************
 //Code
 //*******************************************************************************************
@@ -80,11 +86,8 @@ static BbParser lookup(uint32_t key, uint32_t * index);
  * Must be called at init
  */
 void initBbParser(void){
-	for(uint32_t i = 0; i < PARSER_NUM; ++i){
-		m_parsers[i].key = -1;
-		m_parsers[i].parser = NULL;
-	}
-	m_totalNum = 0;
+	m_parsers.num = 0;
+	m_builders.num = 0;
 }
 
 /**
@@ -108,7 +111,7 @@ void parseBbPacket(Bb* buf){
 			uint32_t k = getBbMessageKey(buf, msg);
 
 			uint32_t i;
-			BbParser p = lookup(k, &i);
+			BbProcessor p = lookup(&m_parsers, k, &i);
 			if(p != NULL){
 				//call the parser
 				(*p)(buf, msg);
@@ -129,46 +132,61 @@ void parseBbPacket(Bb* buf){
  * This will overwrite a parser if module & key already exist in the list
  * Will fail silently if the list is full
  */
-void registerBbParser(uint32_t moduleMessageKey, BbParser parser){
-	if(m_totalNum >= PARSER_NUM){
+void registerBbParser(uint32_t moduleMessageKey, BbProcessor parser){
+	registerProcessor(&m_parsers, moduleMessageKey, parser);
+}
+/**
+ * register a message processor for adding a message to a buffer
+ */
+void registerBbBuilder(uint32_t moduleMessageKey, BbProcessor builder){
+	registerProcessor(&m_builders, moduleMessageKey, builder);
+}
+
+static void registerProcessor(Processors * ps, uint32_t key, BbProcessor p){
+
+	if(ps->num >= PROCESSOR_NUM){
 		return;
 	}
 	uint32_t i;
-	uint32_t k = moduleMessageKey;
-	BbParser p = lookup(k, &i);
-	if(p == NULL){
+	uint32_t k = key;
+	BbProcessor pt = lookup(ps, k, &i);
+	if(pt == NULL){
 		//we didn't find a match so make room by
 		//moving everything up one, from the ith location to the end
-		for(uint32_t j = m_totalNum; j > i; --j){
-			ParserKeyValue * kvNew = &(m_parsers[j]);
-			ParserKeyValue * kvOld = &(m_parsers[j - 1]);
+		for(uint32_t j = ps->num; j > i; --j){
+			ProcessorKeyValue * kvNew = &(ps->m_processors[j]);
+			ProcessorKeyValue * kvOld = &(ps->m_processors[j - 1]);
 			kvNew->key = kvOld->key;
 			kvNew->parser = kvOld->parser;
 		}
-		++m_totalNum;//we now have one more parser
+		++ps->num;//we now have one more parser
 	}
-	m_parsers[i].key = k;
-	m_parsers[i].parser = parser;
+	ps->m_processors[i].key = k;
+	ps->m_processors[i].parser = p;
 }
+
+
+
 
 /**
  * find the parser that is assigned to the specified key
  * or find the position where the specified key might be placed in the list if it is not there
+ * @param ps - the processors struct to look in
  * @param key - the key to lookup
  * @param index - a pointer to the resulting index value - this will indicate the index of the equal or first greater key value
  * @return - -1 if not found, else the index of the function pointer of the parser
  */
-static BbParser lookup(uint32_t key, uint32_t * index){
+static BbProcessor lookup(Processors * ps, uint32_t key, uint32_t * index){
 
-	BbParser result = NULL;
+	BbProcessor result = NULL;
 	//use binary search to find parser
 	uint32_t min = 0;
-	uint32_t max = m_totalNum == 0 ? 0 : m_totalNum - 1;//this will be one past the last element of the list
+	uint32_t max = ps->num == 0 ? 0 : ps->num - 1;//this will be one past the last element of the list
 	uint32_t i;
 	uint32_t ikey = 0;
 	while(true){
 		i = (min + max) / 2;//i will be greater than or equal to i because of the integer math
-		ParserKeyValue kv = m_parsers[i];
+		ProcessorKeyValue kv = ps->m_processors[i];
 		ikey = kv.key;
 
 		if(ikey == key){
