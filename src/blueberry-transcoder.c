@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Blue Robotics Inc.
+Copyright (c) 2024 Blue Robotics North Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -287,11 +287,5 @@ uint16_t computeCrc(Bb* buf, BbBlock block, BbBlock end){
 	getCrc1021P(&crc);
 	return crc;
 }
-
-
-
-
-
-
 
 
