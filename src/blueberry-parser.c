@@ -286,16 +286,18 @@ bool isBbPacketRequested(){
 
 void addBBQueuedMessagesToPacket(Bb* buf){
 	bool started = false;
+	BbBlock msg = PACKET_FIRST_MESSAGE_INDEX;
 	while(isQueueNotEmpty(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE)){
 		if(!started){
-			startBbPacket(buf);
 			started = true;
 		}
 		uint32_t key = m_rxQ[m_rxQFront];
 		uint32_t i = 0;
-		BbProcessor p = lookup(&m_builder, key, &i);
+		BbProcessor p = lookup(&m_builders, key, &i);
 		if(p != NULL){
+			msg = buf->bufferLength;//point to the next free byte of the buffer
 			(*p)(buf, msg);
+
 		}
 	}
 
