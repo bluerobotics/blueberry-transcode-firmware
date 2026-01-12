@@ -108,6 +108,11 @@ void finishBbPacket(Bb* bb);
  */
 bool minBbLengthCheck(Bb* bb);
 
+/**
+ * indicates that messages were received and should trigger a corresponding packet of messages to be sent
+ */
+bool isBbPacketRequested();
+
 
 
 //*******************************************************************************************

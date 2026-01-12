@@ -165,14 +165,16 @@ bool blueberryReceivePacket(Bb* buf){
 }
 /**
  * Free up data from the byte queue and prep the state
+ * @param bb - the buffer containing the packet
+ * @param q - the queue that the packet was received into, if there was one. Set to NULL if not applicable
  */
 void blueberryReceiveDone(Bb* bb, ByteQ* q){
-	discardFromByteQ(q, bb->length);
+	if(q != NULL){
+		discardFromByteQ(q, bb->length);
+	}
 	bb->time = 0;
 	bb->length = 0;//this indicates that the state is reset
-	bb->bufferLength = 0;//don't really need to do this
 	bb->start = 0;//don't really need to do this
-	bb->buffer = NULL;//nor this
 
 
 }

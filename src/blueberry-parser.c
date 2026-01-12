@@ -188,8 +188,9 @@ static BbProcessor lookup(Processors * ps, uint32_t key, uint32_t * index){
 		i = (min + max) / 2;//i will be greater than or equal to i because of the integer math
 		ProcessorKeyValue kv = ps->m_processors[i];
 		ikey = kv.key;
-
-		if(ikey == key){
+		if(ps->num == 0){
+			break;
+		} else if(ikey == key){
 			result = kv.parser;
 			break;
 		} else if(ikey < key){
@@ -275,6 +276,15 @@ void finishBbPacket(Bb* bb){
 	uint16_t crc = computeCrc(bb, PACKET_FIRST_MESSAGE_INDEX, n);
 	setBbUint16(bb, 0, PACKET_CRC_INDEX, crc);
 }
+
+/**
+ * indicates that messages were received and should trigger a corresponding packet of messages to be sent
+ */
+bool isBbPacketRequested(){
+	return isQueueNotEmpty(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE);
+}
+
+
 
 
 
