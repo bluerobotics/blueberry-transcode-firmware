@@ -117,14 +117,22 @@ void parseBbPacket(Bb* buf){
 				(*p)(buf, msg);
 
 				//record in the queue that the particular type of message was received
-				m_rxQ[m_rxQBack] = k;
-				justAddedToQueueBack(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE);
+				queueBbMessage(k);
+
 			}
 		}
 		uint32_t len = getBbMessageLength(buf, msg);
 		msg += len;
 
 	}
+}
+/**
+ * requests that the next packet should have the message with the specified key added.
+ * @param key - the module/message key for the desired message
+ */
+void queueBbMessage(uint32_t key){
+	m_rxQ[m_rxQBack] = key;
+	justAddedToQueueBack(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE);
 }
 /**
  * registers a parser for a given message
