@@ -284,6 +284,24 @@ bool isBbPacketRequested(){
 	return isQueueNotEmpty(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE);
 }
 
+void addBBQueuedMessagesToPacket(Bb* buf){
+	bool started = false;
+	while(isQueueNotEmpty(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE)){
+		if(!started){
+			startBbPacket(buf);
+			started = true;
+		}
+		uint32_t key = m_rxQ[m_rxQFront];
+		uint32_t i = 0;
+		BbProcessor p = lookup(&m_builder, key, &i);
+		if(p != NULL){
+			(*p)(buf, msg);
+		}
+	}
+
+
+}
+
 
 
 
