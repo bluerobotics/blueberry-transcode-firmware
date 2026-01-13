@@ -134,6 +134,9 @@ void queueBbMessage(uint32_t key){
 	m_rxQ[m_rxQBack] = key;
 	justAddedToQueueBack(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE);
 }
+
+
+
 /**
  * registers a parser for a given message
  * This will add a parser if module & key are new
@@ -292,22 +295,33 @@ bool isBbPacketRequested(){
 	return isQueueNotEmpty(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE);
 }
 
-void addBBQueuedMessagesToPacket(Bb* buf){
+/**
+ * Make a packet in the specified buffer that contains all queued messages
+ * bb - the buffer to make the packet in
+ */
+void makeBbPacketWithQueuedMessages(Bb* bb){
 	bool started = false;
 	BbBlock msg = PACKET_FIRST_MESSAGE_INDEX;
 	while(isQueueNotEmpty(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE)){
-		if(!started){
-			started = true;
-		}
 		uint32_t key = m_rxQ[m_rxQFront];
+		doneWithQueueFront(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE);
 		uint32_t i = 0;
 		BbProcessor p = lookup(&m_builders, key, &i);
 		if(p != NULL){
-			msg = buf->bufferLength;//point to the next free byte of the buffer
-			(*p)(buf, msg);
+			if(!started){
+				startBbPacket(bb);
+				started = true;
+			}
+			msg = bb->length;//point to the next free byte of the buffer
+			(*p)(bb, msg);
 
 		}
+
+
+
 	}
+	finishBbPacket(bb);
+
 
 
 }

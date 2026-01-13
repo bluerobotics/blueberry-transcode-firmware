@@ -112,6 +112,17 @@ bool minBbLengthCheck(Bb* bb);
  * indicates that messages were received and should trigger a corresponding packet of messages to be sent
  */
 bool isBbPacketRequested();
+/**
+ * requests that the next packet should have the message with the specified key added.
+ * @param key - the module/message key for the desired message
+ */
+void queueBbMessage(uint32_t key);
+
+/**
+ * Make a packet in the specified buffer that contains all queued messages
+ * bb - the buffer to make the packet in
+ */
+void makeBbPacketWithQueuedMessages(Bb* bb);
 
 
 
