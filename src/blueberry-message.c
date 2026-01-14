@@ -26,6 +26,7 @@ THE SOFTWARE.
 //********************************************************************************
 #include <blueberry-message.h>
 
+
 //********************************************************************************
 //defines
 //********************************************************************************
@@ -39,6 +40,13 @@ THE SOFTWARE.
 #define SEQUENCE_PLACEHOLDER_ELEMENT_LENGTH_INDEX 2
 #define SEQUENCE_BLOCK_ELEMENTS_NUM_INDEX 0
 #define SEQUENCE_BLOCK_DATA_START_INDEX 4
+
+#define STRING_PLACEHOLDER_BLOCK_INDEX 0
+#define STRING_BLOCK_LENGTH_INDEX 0
+#define STRING_BLOCK_DATA_START_INDEX 4
+
+
+
 
 //********************************************************************************
 //types
@@ -122,6 +130,72 @@ BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t seq
 
 	return result;
 }
+
+/**
+ * copies a string from the specified message to the specified memory location
+ * @param buf - the buffer containing the message
+ * @param msg - the index of the message in the buffer
+ * @param i - the index of the string placeholder within the message
+ * @param dest - the location in memory to copy the string to
+ * @param n - the maximum number of characters to copy.
+ * @return the number of characters copied
+ */
+uint32_t copyBbStringFromMessage(Bb* buf, BbBlock msg, uint32_t i, char* dest, uint32_t n){
+	//get the index of the block containing the string data
+	BbBlock si = (BbBlock)getBbUint16(buf, msg, i + STRING_PLACEHOLDER_BLOCK_INDEX);//this is the index of the sequence block
+	//now add on the displacement into the sequence data of the desired element
+	uint32_t m = getBbUint32(buf, msg, si + STRING_BLOCK_LENGTH_INDEX);
+	if(m > n){
+		m = n;
+	}
+	uint32_t k = si + STRING_BLOCK_DATA_START_INDEX;
+	for(uint32_t j = 0; j < m; ++j){
+		dest[j] = getBbUint8(buf, msg, k);
+		++k;
+	}
+	return m;
+}
+
+/**
+ * copies a string from the specified memory location to the message
+ * This will stop when it reads a null (\0) or when it has moved n characters.
+ * @param buf - the buffer containing the message
+ * @param msg - the index of the message in the buffer
+ * @param i - the index of the string placeholder within the message
+ * @param src - the location in memory to copy the string from
+ * @param n - the maximum number of characters to copy.
+ * @return the number of characters copied
+ */
+uint32_t copyBbStringToMessage(Bb* buf, BbBlock msg, uint32_t i, char* src, uint32_t n){
+	//first choose a spot to place the string and record it
+	BbBlock si = buf->length;
+	setBbUint16(buf, msg, i + STRING_PLACEHOLDER_BLOCK_INDEX, si);
+
+	//now copy the data
+	uint32_t j = 0;
+	uint32_t k = si + STRING_BLOCK_DATA_START_INDEX;
+	for(; j < n; ++j){
+		char c = src[j];
+		if(c == '\0'){
+			break;
+		}
+		setBbUint8(buf, msg, k, c);
+		++k;
+	}
+	//now record the length
+	setBbUint32(buf, msg, si + STRING_BLOCK_LENGTH_INDEX, k);
+
+	//update the buffer length
+	buf->length += 4 + k;
+
+	//and update the message length
+	updateBbMessageLength(buf, msg);
+
+	return k;
+}
+
+
+
 /**
  * Gets the index for the specified sequence element. , relative to the specified message.
  * This can be used to read or write from the specified sequence element

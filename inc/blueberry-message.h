@@ -27,6 +27,7 @@ THE SOFTWARE.
 //*******************************************************************************************
 #include <blueberry-transcoder.h>
 #include <stdint.h>
+#include <stdbool.h>
 //*******************************************************************************************
 //Defines
 //*******************************************************************************************
@@ -113,6 +114,29 @@ bool isBbMessageEmpty(Bb* buf, BbBlock msg);
  */
 uint32_t getBbSequenceElementNum(Bb* buf, BbBlock msg, uint32_t i);
 
+
+/**
+ * copies a string from the specified message to the specified memory location
+ * @param buf - the buffer containing the message
+ * @param msg - the index of the message in the buffer
+ * @param i - the index of the string placeholder within the message
+ * @param dest - the location in memory to copy the string to
+ * @param n - the maximum number of characters to copy.
+ * @return the number of characters copied
+ */
+uint32_t copyBbStringFromMessage(Bb* buf, BbBlock msg, uint32_t i, char* dest, uint32_t n);
+
+/**
+ * copies a string from the specified memory location to the message
+ * This will stop when it reads a null (\0) or when it has moved n characters.
+ * @param buf - the buffer containing the message
+ * @param msg - the index of the message in the buffer
+ * @param i - the index of the string placeholder within the message
+ * @param src - the location in memory to copy the string from
+ * @param n - the maximum number of characters to copy.
+ * @return the number of characters copied
+ */
+uint32_t copyBbStringToMessage(Bb* buf, BbBlock msg, uint32_t i, char* src, uint32_t n);
 
 //*******************************************************************************************
 //Code
