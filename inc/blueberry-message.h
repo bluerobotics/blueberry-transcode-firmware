@@ -73,7 +73,14 @@ uint32_t getBbMessageLength(Bb* bb, BbBlock msg);
  * @param sequenceElement - the index of the sequence element. This must be smaller than the sequence length - but this is not checked here.
  */
 BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t sequenceElement);
-
+/**
+ * Gets the length of the specified sequence.
+ * This can be used to read or write from the specified sequence element
+ * @param buf - the buffer containing the data packet, message, etc.
+ * @param msg - the index of the beginning of the message
+ * @param i - the index (in bytes) of the sequence placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
+ */
+uint32_t getBbSequenceLength(Bb*buf, BbBlock msg, uint32_t i);
 /**
  * Initializes the sequence placeholder and sequence length with the required information
  * @param buf - the buffer containing the data packet, message, etc.

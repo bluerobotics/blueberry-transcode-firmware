@@ -134,6 +134,23 @@ BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t seq
 
 	return result;
 }
+/**
+ * Gets the length of the specified sequence.
+ * This can be used to read or write from the specified sequence element
+ * @param buf - the buffer containing the data packet, message, etc.
+ * @param msg - the index of the beginning of the message
+ * @param i - the index (in bytes) of the sequence placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
+ */
+uint32_t getBbSequenceLength(Bb*buf, BbBlock msg, uint32_t i){
+	//if index is invalid then return
+	if(!isBbIndexValid(i)){
+		return 0;
+	}
+	//get the index of the block containing the sequence data
+	BbBlock si = (BbBlock)getBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_BLOCK_INDEX);//this is the index of the sequence block
+	//now add on the displacement into the sequence data of the desired element
+	return getBbUint32(buf, si, SEQUENCE_BLOCK_ELEMENTS_NUM_INDEX);
+}
 
 /**
  * copies a string from the specified message to the specified memory location
