@@ -30,7 +30,7 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Defines
 //*******************************************************************************************
-
+#define BB_INVALID_INDEX (0xffffffff)
 
 //*******************************************************************************************
 //Types
@@ -286,6 +286,13 @@ uint16_t computeCrc(Bb* buf, BbBlock block, BbBlock end){
 	//do from the start to either the buffer end or the block end
 	getCrc1021P(&crc);
 	return crc;
+}
+
+/**
+ * tests if the specified index is not equal to the invalid value 0xffffffff
+ */
+bool isBbIndexValid(BbBlock b){
+	return b != BB_INVALID_INDEX;
 }
 
 

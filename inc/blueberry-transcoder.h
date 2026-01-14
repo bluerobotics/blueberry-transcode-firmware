@@ -160,7 +160,10 @@ uint32_t bbWrap(Bb* buf, int i);
  */
 uint16_t computeCrc(Bb* buf, BbBlock start, BbBlock end);
 
-
+/**
+ * tests if the specified index is not equal to the invalid value 0xffffffff
+ */
+bool isBbIndexValid(BbBlock b);
 
 //*******************************************************************************************
 //Code

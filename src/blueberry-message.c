@@ -120,6 +120,10 @@ static void updateBbMessageLength(Bb* bb, BbBlock msg){
  * @param sequenceElement - the index of the sequence element. This must be smaller than the sequence length - but this is not checked here.
  */
 BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t sequenceElement){
+	//if index is invalid then return
+	if(!isBbIndexValid(i)){
+		return i;
+	}
 	//get byte number per element
 	uint32_t bn = (uint32_t)getBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_ELEMENT_LENGTH_INDEX);
 	//get the index of the block containing the sequence data
@@ -242,6 +246,10 @@ BbBlock initBbSequence(Bb* buf, BbBlock msg, uint32_t i, uint32_t elementByteNum
  * @param arrayElementLength - the length in bytes of each array element
  */
 BbBlock getBbArrayElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t arrayElement, uint32_t arrayElementLength){
+	//if index is invalid then return
+	if(!isBbIndexValid(i)){
+		return i;
+	}
 	return i + arrayElement*arrayElementLength;
 }
 
