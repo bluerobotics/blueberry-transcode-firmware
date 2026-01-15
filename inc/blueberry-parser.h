@@ -129,7 +129,7 @@ void makeBbPacketWithQueuedMessages(Bb* bb);
  * this is useful to compute the next greater index that is word-aligned
  * or to round up a message length to the nearest 4-bytes
  */
-BbBlock bbAlign(uint32_t i);
+BbBlock bbAlign(uint16_t i);
 
 //*******************************************************************************************
 //Code
