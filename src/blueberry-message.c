@@ -193,7 +193,7 @@ uint32_t copyBbStringFromMessage(Bb* buf, BbBlock msg, uint32_t i, char* dest, u
  */
 uint32_t copyBbStringToMessage(Bb* buf, BbBlock msg, uint32_t i, char* src, uint32_t n){
 	BbBlock si;
-	uint32_t j = 0;
+	uint32_t slen = 0;
 	if(n == 0){
 		//if the string should be zero length then simply set the block index to zero
 		si = BB_INVALID_BLOCK;
@@ -201,29 +201,34 @@ uint32_t copyBbStringToMessage(Bb* buf, BbBlock msg, uint32_t i, char* src, uint
 		//first choose a spot to place the string and record it
 		si = buf->length;
 
-
-		//now copy the data
-
-		uint32_t k = STRING_BLOCK_DATA_START_INDEX;
-		for(; j < n; ++j){
-			char c = src[j];
-			if(c == '\0'){
+		for(; slen < n; ++slen){
+			if(src[slen] == '\0'){
 				break;
 			}
-			setBbUint8(buf, si, k, c);
-			++k;
+		}
+		//now slen contains the length of the string
+
+
+
+		buf->length += bbAlign(slen + STRING_BLOCK_DATA_START_INDEX);//advance buffer length in preparation
+
+
+		//now copy the data
+		for(uint32_t j = 0; j < slen; ++j){
+			char c = src[j];
+			setBbUint8(buf, si, STRING_BLOCK_DATA_START_INDEX + j, c);
+
 		}
 		//now record the length
-		setBbUint32(buf, si, STRING_BLOCK_LENGTH_INDEX, j);
+		setBbUint32(buf, si, STRING_BLOCK_LENGTH_INDEX, slen);
 
-		//update the buffer length
-		buf->length += bbAlign(k);
 
-		//and update the message length
+		//and update the message length to the end of the buffer
 		updateBbMessageLength(buf, msg);
 	}
+	//record the string block in the placeholder
 	setBbUint16(buf, msg, i + STRING_PLACEHOLDER_BLOCK_INDEX, si);
-	return j;
+	return slen;
 }
 
 
@@ -259,11 +264,13 @@ BbBlock initBbSequence(Bb* buf, BbBlock msg, uint32_t i, uint32_t elementByteNum
 	} else {
 		//determine location to place the sequence block
 		 result = bbAlign(buf->length);//the sequence data will be added to the current end of the buffer
+		 //expand the buffer in preparation for writing the sequence block
+		 buf->length += bbAlign(4 + (elementNum * elementByteNum));
 		//record the block index
 		setBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_ELEMENT_LENGTH_INDEX, (uint16_t)elementByteNum);
 		setBbUint32(buf, result, SEQUENCE_BLOCK_ELEMENTS_NUM_INDEX, elementNum);//record the number of elements of this sequence
 		//advance buffer by the size of the sequence block
-		buf->length += bbAlign(4 + (elementNum * elementByteNum));
+
 		updateBbMessageLength(buf, msg);
 	}
 	setBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_BLOCK_INDEX, (uint16_t)result);

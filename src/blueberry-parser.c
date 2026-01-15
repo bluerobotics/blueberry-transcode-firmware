@@ -241,13 +241,16 @@ bool minBbLengthCheck(Bb* bb){
  * a function to test the start word of the packet. It will check only up to the Bb.length. It should return true so long as the start word is good
  */
 bool checkBbPreamble(Bb* bb){
-		uint32_t a = getBbUint32(bb, 0, PACKET_PREAMBLE_INDEX);
-		uint32_t b = PACKET_PREAMBLE;
-		uint32_t n = bb->length;
-		uint32_t i = n >= 4 ? 0 : 4 - n;
-		uint32_t m = 0xffffffff >> (i*8);
-		uint32_t r = (a ^ b) & m;
-		return r == 0;
+	uint32_t n = bb->length;
+	uint32_t a = 0;
+	n = n > 4 ? 4 : n;//n will now cap out at 4
+	uint32_t b = PACKET_PREAMBLE & (0xffffffff >> ((4 - n)*8));
+	for(uint32_t j = 0; j < n; ++j){
+		a |= ((uint32_t)getBbUint8(bb, 0, PACKET_PREAMBLE_INDEX + j)) << (j*8);
+	}
+
+
+	return (a ^ b) == 0;
 }
 /**
  * a function to test the length of the received packet so far. It should return true when enough bytes have been received
@@ -272,10 +275,11 @@ bool checkBbCrc(Bb* bb){
  * does any preliminary header setup and computes the location for the starting message
  */
 BbBlock startBbPacket(Bb* bb){
+	bb->length = PACKET_FIRST_MESSAGE_INDEX;
 	setBbUint32(bb, 0, 0, PACKET_PREAMBLE);
 //	setBbUint16(bb, 0, PACKET_CRC_INDEX, 0xffff);
 //	setBbUint16(bb, 0, PACKET_LENGTH_INDEX, 0);
-	bb->length = PACKET_FIRST_MESSAGE_INDEX;
+
 	return PACKET_FIRST_MESSAGE_INDEX;
 }
 /**

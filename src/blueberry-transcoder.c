@@ -256,14 +256,22 @@ void setBbBool(Bb* buf, BbBlock block, uint32_t i, uint32_t bitNum, bool v){
 }
 
 /**
+ * Checks for overflows and
  * converts a linear index to a circular one
  * essentially mods the index with the buffer size
  * @return the wrapped index
  */
 uint32_t bbWrap(Bb* buf, int i){
-	uint32_t j = i + buf->start;
-	uint32_t n = buf->bufferLength;
-	return j % n;
+	uint32_t j;
+	if(i >= buf->length){
+		j = 0;//this should be safe but will obviously return the wrong value
+		asm("nop");
+	} else {
+		j = i + buf->start;
+		uint32_t n = buf->bufferLength;
+		j %= n;
+	}
+	return j;
 }
 /**
  * computes the crc of the buffer
