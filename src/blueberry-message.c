@@ -118,7 +118,7 @@ static void updateBbMessageLength(Bb* bb, BbBlock msg){
  */
 BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t sequenceElement){
 	//if index is invalid then return
-	if(isBbIndexInvalid(i)){
+	if(isBbBlockInvalid(i)){
 		return i;
 	}
 	//get byte number per element
@@ -140,13 +140,17 @@ BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t seq
  */
 uint32_t getBbSequenceLength(Bb*buf, BbBlock msg, uint32_t i){
 	//if index is invalid then return
-	if(isBbIndexInvalid(i)){
+	if(isBbBlockInvalid(i)){
 		return 0;
 	}
 	//get the index of the block containing the sequence data
 	BbBlock si = (BbBlock)getBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_BLOCK_INDEX);//this is the index of the sequence block
+	uint32_t result = 0;
 	//now add on the displacement into the sequence data of the desired element
-	return getBbUint32(buf, si, SEQUENCE_BLOCK_ELEMENTS_NUM_INDEX);
+	if(si != BB_INVALID_BLOCK){
+		result = getBbUint32(buf, si, SEQUENCE_BLOCK_ELEMENTS_NUM_INDEX);
+	}
+	return result;
 }
 
 /**
@@ -188,31 +192,38 @@ uint32_t copyBbStringFromMessage(Bb* buf, BbBlock msg, uint32_t i, char* dest, u
  * @return the number of characters copied
  */
 uint32_t copyBbStringToMessage(Bb* buf, BbBlock msg, uint32_t i, char* src, uint32_t n){
-	//first choose a spot to place the string and record it
-	BbBlock si = buf->length;
-	setBbUint16(buf, msg, i + STRING_PLACEHOLDER_BLOCK_INDEX, si);
-
-	//now copy the data
+	BbBlock si;
 	uint32_t j = 0;
-	uint32_t k = STRING_BLOCK_DATA_START_INDEX;
-	for(; j < n; ++j){
-		char c = src[j];
-		if(c == '\0'){
-			break;
+	if(n == 0){
+		//if the string should be zero length then simply set the block index to zero
+		si = BB_INVALID_BLOCK;
+	} else {
+		//first choose a spot to place the string and record it
+		si = buf->length;
+
+
+		//now copy the data
+
+		uint32_t k = STRING_BLOCK_DATA_START_INDEX;
+		for(; j < n; ++j){
+			char c = src[j];
+			if(c == '\0'){
+				break;
+			}
+			setBbUint8(buf, si, k, c);
+			++k;
 		}
-		setBbUint8(buf, si, k, c);
-		++k;
+		//now record the length
+		setBbUint32(buf, si, STRING_BLOCK_LENGTH_INDEX, j);
+
+		//update the buffer length
+		buf->length += bbAlign(k);
+
+		//and update the message length
+		updateBbMessageLength(buf, msg);
 	}
-	//now record the length
-	setBbUint32(buf, si, STRING_BLOCK_LENGTH_INDEX, j);
-
-	//update the buffer length
-	buf->length += bbAlign(k);
-
-	//and update the message length
-	updateBbMessageLength(buf, msg);
-
-	return k;
+	setBbUint16(buf, msg, i + STRING_PLACEHOLDER_BLOCK_INDEX, si);
+	return j;
 }
 
 
@@ -241,15 +252,22 @@ uint32_t getBbSequenceElementNum(Bb* buf, BbBlock msg, uint32_t i){
 
  */
 BbBlock initBbSequence(Bb* buf, BbBlock msg, uint32_t i, uint32_t elementByteNum, uint32_t elementNum){
-	//determine location to place the sequence block
-	BbBlock result = bbAlign(buf->length);//the sequence data will be added to the current end of the buffer
-	//record the block index
+	BbBlock result;
+	if(elementNum == 0){
+		//if there are zero elements then only set the block index to zero
+		result = BB_INVALID_BLOCK;
+	} else {
+		//determine location to place the sequence block
+		 result = bbAlign(buf->length);//the sequence data will be added to the current end of the buffer
+		//record the block index
+		setBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_ELEMENT_LENGTH_INDEX, (uint16_t)elementByteNum);
+		setBbUint32(buf, result, SEQUENCE_BLOCK_ELEMENTS_NUM_INDEX, elementNum);//record the number of elements of this sequence
+		//advance buffer by the size of the sequence block
+		buf->length += bbAlign(4 + (elementNum * elementByteNum));
+		updateBbMessageLength(buf, msg);
+	}
 	setBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_BLOCK_INDEX, (uint16_t)result);
-	setBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_ELEMENT_LENGTH_INDEX, (uint16_t)elementByteNum);
-	setBbUint32(buf, result, SEQUENCE_BLOCK_ELEMENTS_NUM_INDEX, elementNum);//record the number of elements of this sequence
-	//advance buffer by the size of the sequence block
-	buf->length += bbAlign(4 + (elementNum * elementByteNum));
-	updateBbMessageLength(buf, msg);
+
 	return result;
 }
 
@@ -264,7 +282,7 @@ BbBlock initBbSequence(Bb* buf, BbBlock msg, uint32_t i, uint32_t elementByteNum
  */
 BbBlock getBbArrayElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t arrayElement, uint32_t arrayElementLength){
 	//if index is invalid then return
-	if(isBbIndexInvalid(i)){
+	if(isBbBlockInvalid(i)){
 		return i;
 	}
 	return i + arrayElement*arrayElementLength;

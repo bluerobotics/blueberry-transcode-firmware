@@ -32,6 +32,7 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Defines
 //*******************************************************************************************
+#define BB_INVALID_BLOCK (0xffff)
 
 //*******************************************************************************************
 //Types
@@ -55,6 +56,7 @@ typedef struct {
  * this is really an index into the buffer, measured in bytes, although it is assumed to be linear,
  * even if the buffer wraps partway through the packet.
  * If this value is i and the packet length is n, then 0 <= i < n.
+ * An official invalid value for a block is 0xffff, or BB_INVALID_BLOCK
  */
 typedef uint32_t BbBlock;
 //typedef uint32_t BbArray;//ditto

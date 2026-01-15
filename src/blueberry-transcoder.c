@@ -30,7 +30,6 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Defines
 //*******************************************************************************************
-#define BB_INVALID_INDEX (0xffffffff)
 
 //*******************************************************************************************
 //Types
@@ -291,8 +290,8 @@ uint16_t computeCrc(Bb* buf, BbBlock block, BbBlock end){
 /**
  * tests if the specified index is not equal to the invalid value 0xffffffff
  */
-bool isBbIndexInvalid(BbBlock b){
-	return b == BB_INVALID_INDEX;
+bool isBbBlockInvalid(BbBlock b){
+	return b == BB_INVALID_BLOCK;
 }
 
 
