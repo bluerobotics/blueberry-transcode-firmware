@@ -291,8 +291,8 @@ uint16_t computeCrc(Bb* buf, BbBlock block, BbBlock end){
 /**
  * tests if the specified index is not equal to the invalid value 0xffffffff
  */
-bool isBbIndexValid(BbBlock b){
-	return b != BB_INVALID_INDEX;
+bool isBbIndexInvalid(BbBlock b){
+	return b == BB_INVALID_INDEX;
 }
 
 

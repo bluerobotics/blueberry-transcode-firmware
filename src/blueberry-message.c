@@ -121,7 +121,7 @@ static void updateBbMessageLength(Bb* bb, BbBlock msg){
  */
 BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t sequenceElement){
 	//if index is invalid then return
-	if(!isBbIndexValid(i)){
+	if(isBbIndexInvalid(i)){
 		return i;
 	}
 	//get byte number per element
@@ -143,7 +143,7 @@ BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t seq
  */
 uint32_t getBbSequenceLength(Bb*buf, BbBlock msg, uint32_t i){
 	//if index is invalid then return
-	if(!isBbIndexValid(i)){
+	if(isBbIndexInvalid(i)){
 		return 0;
 	}
 	//get the index of the block containing the sequence data
@@ -165,13 +165,13 @@ uint32_t copyBbStringFromMessage(Bb* buf, BbBlock msg, uint32_t i, char* dest, u
 	//get the index of the block containing the string data
 	BbBlock si = (BbBlock)getBbUint16(buf, msg, i + STRING_PLACEHOLDER_BLOCK_INDEX);//this is the index of the sequence block
 	//now add on the displacement into the sequence data of the desired element
-	uint32_t m = getBbUint32(buf, msg, si + STRING_BLOCK_LENGTH_INDEX);
+	uint32_t m = getBbUint32(buf, si, STRING_BLOCK_LENGTH_INDEX);
 	if(m > n){
 		m = n;
 	}
-	uint32_t k = si + STRING_BLOCK_DATA_START_INDEX;
+	uint32_t k = STRING_BLOCK_DATA_START_INDEX;
 	for(uint32_t j = 0; j < m; ++j){
-		dest[j] = getBbUint8(buf, msg, k);
+		dest[j] = getBbUint8(buf, si, k);
 		++k;
 	}
 	return m;
@@ -194,20 +194,20 @@ uint32_t copyBbStringToMessage(Bb* buf, BbBlock msg, uint32_t i, char* src, uint
 
 	//now copy the data
 	uint32_t j = 0;
-	uint32_t k = si + STRING_BLOCK_DATA_START_INDEX;
+	uint32_t k = STRING_BLOCK_DATA_START_INDEX;
 	for(; j < n; ++j){
 		char c = src[j];
 		if(c == '\0'){
 			break;
 		}
-		setBbUint8(buf, msg, k, c);
+		setBbUint8(buf, si, k, c);
 		++k;
 	}
 	//now record the length
-	setBbUint32(buf, msg, si + STRING_BLOCK_LENGTH_INDEX, k);
+	setBbUint32(buf, si, STRING_BLOCK_LENGTH_INDEX, j);
 
 	//update the buffer length
-	buf->length += 4 + k;
+	buf->length += k;
 
 	//and update the message length
 	updateBbMessageLength(buf, msg);
@@ -264,7 +264,7 @@ BbBlock initBbSequence(Bb* buf, BbBlock msg, uint32_t i, uint32_t elementByteNum
  */
 BbBlock getBbArrayElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t arrayElement, uint32_t arrayElementLength){
 	//if index is invalid then return
-	if(!isBbIndexValid(i)){
+	if(isBbIndexInvalid(i)){
 		return i;
 	}
 	return i + arrayElement*arrayElementLength;
