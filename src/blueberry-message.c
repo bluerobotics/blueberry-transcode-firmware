@@ -59,10 +59,7 @@ THE SOFTWARE.
 //********************************************************************************
 //function prototypes
 //********************************************************************************
-/**
- * takes the specified index and aligns it to a 4-byte boundary
- */
-static BbBlock align(uint32_t i);
+
 /**
  * updates the message length field fromm the buffer length
  * This is only used during message creation
@@ -107,7 +104,7 @@ uint32_t getBbMessageLength(Bb* bb, BbBlock msg){
  * @param msg - the index of the beginning of the message
  */
 static void updateBbMessageLength(Bb* bb, BbBlock msg){
-	setBbUint16(bb, msg, MESSAGE_LENGTH_INDEX, align((uint16_t)(bb->length - (uint32_t)msg))/4);
+	setBbUint16(bb, msg, MESSAGE_LENGTH_INDEX, bbAlign((uint16_t)(bb->length - (uint32_t)msg))/4);
 }
 
 
@@ -154,6 +151,7 @@ uint32_t getBbSequenceLength(Bb*buf, BbBlock msg, uint32_t i){
 
 /**
  * copies a string from the specified message to the specified memory location
+ * the string in memory will be null terminated
  * @param buf - the buffer containing the message
  * @param msg - the index of the message in the buffer
  * @param i - the index of the string placeholder within the message
@@ -169,11 +167,13 @@ uint32_t copyBbStringFromMessage(Bb* buf, BbBlock msg, uint32_t i, char* dest, u
 	if(m > n){
 		m = n;
 	}
+	uint32_t j = 0;
 	uint32_t k = STRING_BLOCK_DATA_START_INDEX;
-	for(uint32_t j = 0; j < m; ++j){
+	for(; j < m; ++j){
 		dest[j] = getBbUint8(buf, si, k);
 		++k;
 	}
+	dest[j] = 0;//add null termination
 	return m;
 }
 
@@ -207,7 +207,7 @@ uint32_t copyBbStringToMessage(Bb* buf, BbBlock msg, uint32_t i, char* src, uint
 	setBbUint32(buf, si, STRING_BLOCK_LENGTH_INDEX, j);
 
 	//update the buffer length
-	buf->length += k;
+	buf->length += bbAlign(k);
 
 	//and update the message length
 	updateBbMessageLength(buf, msg);
@@ -242,13 +242,13 @@ uint32_t getBbSequenceElementNum(Bb* buf, BbBlock msg, uint32_t i){
  */
 BbBlock initBbSequence(Bb* buf, BbBlock msg, uint32_t i, uint32_t elementByteNum, uint32_t elementNum){
 	//determine location to place the sequence block
-	BbBlock result = align(buf->length);//the sequence data will be added to the current end of the buffer
+	BbBlock result = bbAlign(buf->length);//the sequence data will be added to the current end of the buffer
 	//record the block index
 	setBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_BLOCK_INDEX, (uint16_t)result);
 	setBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_ELEMENT_LENGTH_INDEX, (uint16_t)elementByteNum);
 	setBbUint32(buf, result, SEQUENCE_BLOCK_ELEMENTS_NUM_INDEX, elementNum);//record the number of elements of this sequence
 	//advance buffer by the size of the sequence block
-	buf->length += 4 + (elementNum * elementByteNum);
+	buf->length += bbAlign(4 + (elementNum * elementByteNum));
 	updateBbMessageLength(buf, msg);
 	return result;
 }
@@ -270,20 +270,7 @@ BbBlock getBbArrayElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t arrayE
 	return i + arrayElement*arrayElementLength;
 }
 
-/**
- * takes the specified value and rounds it up to the nearest multiple of 4
- * this is useful to compute the next greater index that is word-aligned
- * or to round up a message length to the nearest 4-bytes
- */
-static BbBlock align(uint32_t i){
-	BbBlock result = i;
 
-	if(i & 0b11){
-		result |= 0b11;
-		result += 1;
-	}
-	return result;
-}
 /**
  * Checks to see if this message contains data
  * @param buf - the buffer containing the data packet, message, etc.

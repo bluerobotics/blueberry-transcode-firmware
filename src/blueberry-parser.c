@@ -40,9 +40,9 @@ THE SOFTWARE.
 #define MAKE_KEY(mod, msg) ((((uint32_t)mod) << 16) | ((uint32_t)msg))
 
 #define PACKET_PREAMBLE (0x45554c42)
+#define PACKET_PREAMBLE_INDEX (0)
 #define PACKET_LENGTH_INDEX (4)
 #define PACKET_CRC_INDEX (6)
-#define PACKET_PREAMBLE_INDEX (0)
 #define PACKET_FIRST_MESSAGE_INDEX (8)
 
 
@@ -253,10 +253,10 @@ bool checkBbPreamble(Bb* bb){
  * a function to test the length of the received packet so far. It should return true when enough bytes have been received
  */
 bool checkBbLength(Bb* bb){
-	uint32_t len = getBbUint16(bb, 0, PACKET_LENGTH_INDEX);
+	uint32_t len = getBbUint16(bb, 0, PACKET_LENGTH_INDEX)*4;
 	uint32_t n = bb->length;
 
-	return n >= 6 && n >= len*4;
+	return n >= PACKET_FIRST_MESSAGE_INDEX && n >= len;
 }
 /**
  * a function to check the CRC of the received bytes. It will return true with a correct match
@@ -284,7 +284,7 @@ BbBlock startBbPacket(Bb* bb){
  * And all messages construted correctly
  */
 void finishBbPacket(Bb* bb){
-	uint32_t n = bb->length;
+	uint32_t n = bbAlign(bb->length);
 //	setBbUint32(bb, 0, 0, PACKET_PREAMBLE);
 	setBbUint16(bb, 0, PACKET_LENGTH_INDEX, (uint16_t)(n/4));
 	uint16_t crc = computeCrc(bb, PACKET_FIRST_MESSAGE_INDEX, n);
@@ -327,6 +327,21 @@ void makeBbPacketWithQueuedMessages(Bb* bb){
 
 
 
+}
+
+/**
+ * takes the specified value and rounds it up to the nearest multiple of 4
+ * this is useful to compute the next greater index that is word-aligned
+ * or to round up a message length to the nearest 4-bytes
+ */
+BbBlock bbAlign(uint32_t i){
+	BbBlock result = i;
+
+	if(i & 0b11){
+		result |= 0b11;
+		result += 1;
+	}
+	return result;
 }
 
 

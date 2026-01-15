@@ -124,7 +124,12 @@ void queueBbMessage(uint32_t key);
  */
 void makeBbPacketWithQueuedMessages(Bb* bb);
 
-
+/**
+ * takes the specified value and rounds it up to the nearest multiple of 4
+ * this is useful to compute the next greater index that is word-aligned
+ * or to round up a message length to the nearest 4-bytes
+ */
+BbBlock bbAlign(uint32_t i);
 
 //*******************************************************************************************
 //Code
