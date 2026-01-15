@@ -54,7 +54,7 @@ THE SOFTWARE.
  *  @param i the index offset in bytes
  *  @return the value
  */
-uint8_t getBbUint8(Bb* buf, BbBlock block, uint32_t i){
+uint8_t getBbUint8(Bb* buf, BbBlock block, uint16_t i){
 	return buf->buffer[bbWrap(buf, block + i)];
 }
 
@@ -65,7 +65,7 @@ uint8_t getBbUint8(Bb* buf, BbBlock block, uint32_t i){
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbUint8(Bb* buf, BbBlock block, uint32_t i, uint8_t v){
+void setBbUint8(Bb* buf, BbBlock block, uint16_t i, uint8_t v){
 	buf->buffer[bbWrap(buf, block + i)] = v;
 }
 
@@ -76,7 +76,7 @@ void setBbUint8(Bb* buf, BbBlock block, uint32_t i, uint8_t v){
  *  @param i the index offset in bytes
  *  @return the value
  */
-int8_t getBbInt8(Bb* buf, BbBlock block, uint32_t i){
+int8_t getBbInt8(Bb* buf, BbBlock block, uint16_t i){
 	return (int8_t)getBbUint8(buf, block, i);
 }
 
@@ -87,7 +87,7 @@ int8_t getBbInt8(Bb* buf, BbBlock block, uint32_t i){
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbInt8(Bb* buf, BbBlock block, uint32_t i, int8_t v){
+void setBbInt8(Bb* buf, BbBlock block, uint16_t i, int8_t v){
 	setBbUint8(buf, block, i, (uint8_t)v);
 }
 
@@ -99,7 +99,7 @@ void setBbInt8(Bb* buf, BbBlock block, uint32_t i, int8_t v){
  *  @param i the index offset in bytes
  *  @return the value
  */
-uint16_t getBbUint16(Bb* buf, BbBlock block, uint32_t i){
+uint16_t getBbUint16(Bb* buf, BbBlock block, uint16_t i){
 	uint16_t result;
 	uint8_t* bs = (uint8_t*)&result;
 	bs[0] = getBbUint8(buf, block, i);
@@ -114,7 +114,7 @@ uint16_t getBbUint16(Bb* buf, BbBlock block, uint32_t i){
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbUint16(Bb* buf, BbBlock block, uint32_t i, uint16_t v){
+void setBbUint16(Bb* buf, BbBlock block, uint16_t i, uint16_t v){
 	uint8_t* bs = (uint8_t*)&v;
 	setBbUint8(buf, block, i,   bs[0]);
 	setBbUint8(buf, block, i+1, bs[1]);
@@ -127,7 +127,7 @@ void setBbUint16(Bb* buf, BbBlock block, uint32_t i, uint16_t v){
  *  @param i the index offset in bytes
  *  @return the value
  */
-int16_t getBbInt16(Bb* buf, BbBlock block, uint32_t i){
+int16_t getBbInt16(Bb* buf, BbBlock block, uint16_t i){
 	return (int16_t)getBbUint16(buf, block, i);
 }
 
@@ -138,7 +138,7 @@ int16_t getBbInt16(Bb* buf, BbBlock block, uint32_t i){
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbInt16(Bb* buf, BbBlock block, uint32_t i, int16_t v){
+void setBbInt16(Bb* buf, BbBlock block, uint16_t i, int16_t v){
 	setBbUint16(buf, block, i, (uint16_t)v);
 }
 
@@ -149,7 +149,7 @@ void setBbInt16(Bb* buf, BbBlock block, uint32_t i, int16_t v){
  *  @param i the index offset in bytes
  *  @return the value
  */
-uint32_t getBbUint32(Bb* buf, BbBlock block, uint32_t i){
+uint32_t getBbUint32(Bb* buf, BbBlock block, uint16_t i){
 	uint32_t result;
 	uint8_t* bs = (uint8_t*)&result;
 	bs[0] = getBbUint8(buf, block, i);
@@ -166,7 +166,7 @@ uint32_t getBbUint32(Bb* buf, BbBlock block, uint32_t i){
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbUint32(Bb* buf, BbBlock block, uint32_t i, uint32_t v){
+void setBbUint32(Bb* buf, BbBlock block, uint16_t i, uint32_t v){
 	uint8_t* bs = (uint8_t*)&v;
 	setBbUint8(buf, block, i,   bs[0]);
 	setBbUint8(buf, block, i+1, bs[1]);
@@ -182,7 +182,7 @@ void setBbUint32(Bb* buf, BbBlock block, uint32_t i, uint32_t v){
  *  @param i the index offset in bytes
  *  @return the value
  */
-int32_t getBbInt32(Bb* buf, BbBlock block, uint32_t i){
+int32_t getBbInt32(Bb* buf, BbBlock block, uint16_t i){
 	return (int16_t)getBbUint16(buf, block, i);
 
 }
@@ -194,7 +194,7 @@ int32_t getBbInt32(Bb* buf, BbBlock block, uint32_t i){
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbInt32(Bb* buf, BbBlock block, uint32_t i, int32_t v){
+void setBbInt32(Bb* buf, BbBlock block, uint16_t i, int32_t v){
 	setBbUint32(buf, block, i, (uint32_t)v);
 
 }
@@ -207,7 +207,7 @@ void setBbInt32(Bb* buf, BbBlock block, uint32_t i, int32_t v){
  *  @return the value
  *
  */
-float getBbFloat32(Bb* buf, BbBlock block, uint32_t i){
+float getBbFloat32(Bb* buf, BbBlock block, uint16_t i){
 	uint32_t ip = getBbUint32(buf, block, i);
 	float* fp = (float*)(&ip);
 	return *fp;
@@ -220,7 +220,7 @@ float getBbFloat32(Bb* buf, BbBlock block, uint32_t i){
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbFloat32(Bb* buf, BbBlock block, uint32_t i, float v){
+void setBbFloat32(Bb* buf, BbBlock block, uint16_t i, float v){
 	float* fp = &v;
 	uint32_t* ip = (uint32_t*)fp;
 	setBbUint32(buf, block, i, *ip);
@@ -233,7 +233,7 @@ void setBbFloat32(Bb* buf, BbBlock block, uint32_t i, float v){
  *  @param i the index offset in bytes
  *  @return the value
  */
-bool getBbBool(Bb* buf, BbBlock block, uint32_t i, uint32_t bitNum){
+bool getBbBool(Bb* buf, BbBlock block, uint16_t i, uint32_t bitNum){
 	uint8_t bf = getBbUint8(buf, block, i);
 	return (bf & (1<<bitNum)) != 0;
 }
@@ -245,7 +245,7 @@ bool getBbBool(Bb* buf, BbBlock block, uint32_t i, uint32_t bitNum){
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbBool(Bb* buf, BbBlock block, uint32_t i, uint32_t bitNum, bool v){
+void setBbBool(Bb* buf, BbBlock block, uint16_t i, uint32_t bitNum, bool v){
 	uint8_t* b = &(buf->buffer[bbWrap(buf, block + i)]);
 	uint8_t m = 1 << bitNum;
 	if(v){
@@ -283,7 +283,7 @@ uint16_t computeCrc(Bb* buf, BbBlock block, BbBlock end){
 
 	uint16_t crc;
 	resetCrc1021P(&crc);
-	for(uint32_t i = block; i < end; i += 4){
+	for(uint16_t i = block; i < end; i += 4){
 		uint32_t w = getBbUint32(buf, i, 0);
 
 		crc1021P32(&crc, w);

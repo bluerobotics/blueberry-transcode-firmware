@@ -72,7 +72,7 @@ uint32_t getBbMessageLength(Bb* bb, BbBlock msg);
  * @param i - the index (in bytes) of the sequence placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
  * @param sequenceElement - the index of the sequence element. This must be smaller than the sequence length - but this is not checked here.
  */
-BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t sequenceElement);
+BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock msg, uint16_t i, uint32_t sequenceElement);
 /**
  * Gets the length of the specified sequence.
  * This can be used to read or write from the specified sequence element
@@ -80,7 +80,7 @@ BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t seq
  * @param msg - the index of the beginning of the message
  * @param i - the index (in bytes) of the sequence placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
  */
-uint32_t getBbSequenceLength(Bb*buf, BbBlock msg, uint32_t i);
+uint32_t getBbSequenceLength(Bb*buf, BbBlock msg, uint16_t i);
 /**
  * Initializes the sequence placeholder and sequence length with the required information
  * @param buf - the buffer containing the data packet, message, etc.
@@ -91,7 +91,7 @@ uint32_t getBbSequenceLength(Bb*buf, BbBlock msg, uint32_t i);
  * @return the block in the buffer containing the sequence data
 
  */
-BbBlock initBbSequence(Bb* buf, BbBlock msg, uint32_t i, uint32_t elementByteNum, uint32_t elementNum);
+BbBlock initBbSequence(Bb* buf, BbBlock msg, uint16_t i, uint32_t elementByteNum, uint32_t elementNum);
 
 
 /**
@@ -102,7 +102,7 @@ BbBlock initBbSequence(Bb* buf, BbBlock msg, uint32_t i, uint32_t elementByteNum
  * @param arrayElement - the item of the array that we want
  * @param arrayElementLength - the length in bytes of each array element
  */
-BbBlock getBbArrayElementIndex(Bb* buf, BbBlock msg, uint32_t i, uint32_t arrayElement, uint32_t arrayElementLength);
+BbBlock getBbArrayElementIndex(Bb* buf, BbBlock msg, uint16_t i, uint32_t arrayElement, uint32_t arrayElementLength);
 
 /**
  * Checks to see if this message contains data
@@ -119,7 +119,7 @@ bool isBbMessageEmpty(Bb* buf, BbBlock msg);
  * @param msg - the index of the beginning of the message
  * @param i - the index (in bytes) of the sequence placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
  */
-uint32_t getBbSequenceElementNum(Bb* buf, BbBlock msg, uint32_t i);
+uint32_t getBbSequenceElementNum(Bb* buf, BbBlock msg, uint16_t i);
 
 
 /**
@@ -131,7 +131,7 @@ uint32_t getBbSequenceElementNum(Bb* buf, BbBlock msg, uint32_t i);
  * @param n - the maximum number of characters to copy.
  * @return the number of characters copied
  */
-uint32_t copyBbStringFromMessage(Bb* buf, BbBlock msg, uint32_t i, char* dest, uint32_t n);
+uint32_t copyBbStringFromMessage(Bb* buf, BbBlock msg, uint16_t i, char* dest, uint32_t n);
 
 /**
  * copies a string from the specified memory location to the message
@@ -143,7 +143,7 @@ uint32_t copyBbStringFromMessage(Bb* buf, BbBlock msg, uint32_t i, char* dest, u
  * @param n - the maximum number of characters to copy.
  * @return the number of characters copied
  */
-uint32_t copyBbStringToMessage(Bb* buf, BbBlock msg, uint32_t i, char* src, uint32_t n);
+uint32_t copyBbStringToMessage(Bb* buf, BbBlock msg, uint16_t i, char* src, uint32_t n);
 
 //*******************************************************************************************
 //Code
