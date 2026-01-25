@@ -231,11 +231,12 @@ void setBbFloat32(Bb* buf, BbBlock block, uint16_t i, float v){
  *  @param buf the buffer to read
  *  @param block the block offset in bytes
  *  @param i the index offset in bytes
+ *  @param bitMask the mask for the bit in question: (1<<bitNum)
  *  @return the value
  */
-bool getBbBool(Bb* buf, BbBlock block, uint16_t i, uint32_t bitNum){
+bool getBbBool(Bb* buf, BbBlock block, uint16_t i, uint32_t bitMask){
 	uint8_t bf = getBbUint8(buf, block, i);
-	return (bf & (1<<bitNum)) != 0;
+	return (bf & bitMask) != 0;
 }
 
 /**
@@ -243,11 +244,12 @@ bool getBbBool(Bb* buf, BbBlock block, uint16_t i, uint32_t bitNum){
  *  @param buf the buffer to read
  *  @param block the block offset in bytes
  *  @param i the index offset in bytes
+ *  @param bitMask the mask for the bit in question: (1<<bitNum)
  *  @param v the value to write
  */
-void setBbBool(Bb* buf, BbBlock block, uint16_t i, uint32_t bitNum, bool v){
+void setBbBool(Bb* buf, BbBlock block, uint16_t i, uint32_t bitMask, bool v){
 	uint8_t* b = &(buf->buffer[bbWrap(buf, block + i)]);
-	uint8_t m = 1 << bitNum;
+	uint8_t m = bitMask;
 	if(v){
 		*b |= m;
 	} else {
