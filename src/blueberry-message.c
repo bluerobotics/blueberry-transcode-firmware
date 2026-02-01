@@ -127,8 +127,7 @@ BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock msg, uint16_t i, uint32_t seq
 	BbBlock result = (BbBlock)getBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_BLOCK_INDEX);//this is the index of the sequence block
 	//now add on the displacement into the sequence data of the desired element
 	result += SEQUENCE_BLOCK_DATA_START_INDEX + sequenceElement*bn;
-	result -= msg;//subtract this so the result is still relative to the specified message
-
+	result += msg;//add on message offset to make index absolute
 	return result;
 }
 /**
@@ -169,7 +168,7 @@ uint32_t getBbStringLength(Bb*buf, BbBlock msg, uint16_t i){
 	uint32_t result = 0;
 	//now add on the displacement into the sequence data of the desired element
 	if(si != BB_INVALID_BLOCK){
-		result = getBbUint32(buf, si, STRING_BLOCK_LENGTH_INDEX);
+		result = getBbUint32(buf, si + msg, STRING_BLOCK_LENGTH_INDEX);//index is relative to the message start
 	}
 	return result;
 }
@@ -186,6 +185,7 @@ uint32_t getBbStringLength(Bb*buf, BbBlock msg, uint16_t i){
 uint32_t copyBbStringFromMessage(Bb* buf, BbBlock msg, uint16_t i, char* dest, uint32_t n){
 	//get the index of the block containing the string data
 	BbBlock si = (BbBlock)getBbUint16(buf, msg, i + STRING_PLACEHOLDER_BLOCK_INDEX);//this is the index of the sequence block
+	si += msg;//make index absolute
 	//now add on the displacement into the sequence data of the desired element
 	uint32_t m = getBbUint32(buf, si, STRING_BLOCK_LENGTH_INDEX);
 	if(m > n){
@@ -247,7 +247,7 @@ uint32_t copyBbStringToMessage(Bb* buf, BbBlock msg, uint16_t i, char* src, uint
 		updateBbMessageLength(buf, msg);
 	}
 	//record the string block in the placeholder
-	setBbUint16(buf, msg, i + STRING_PLACEHOLDER_BLOCK_INDEX, si);
+	setBbUint16(buf, msg, i + STRING_PLACEHOLDER_BLOCK_INDEX, si - msg);//make relative to message start
 	return slen;
 }
 
@@ -263,6 +263,7 @@ uint32_t copyBbStringToMessage(Bb* buf, BbBlock msg, uint16_t i, char* src, uint
 uint32_t getBbSequenceElementNum(Bb* buf, BbBlock msg, uint16_t i){
 	//get the index of the block containing the sequence data
 	BbBlock seq = (BbBlock)getBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_BLOCK_INDEX);//this is the index of the sequence block
+	seq += msg;//sequence index is relative to message start so make absolute
 	uint32_t result = getBbUint16(buf, seq, SEQUENCE_BLOCK_ELEMENTS_NUM_INDEX);
 	return result;
 }
@@ -293,7 +294,7 @@ BbBlock initBbSequence(Bb* buf, BbBlock msg, uint16_t i, uint32_t elementByteNum
 
 		updateBbMessageLength(buf, msg);
 	}
-	setBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_BLOCK_INDEX, (uint16_t)result);
+	setBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_BLOCK_INDEX, (uint16_t)(result - msg));//block index is relative to the message start
 
 	return result;
 }
