@@ -127,7 +127,6 @@ BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock msg, uint16_t i, uint32_t seq
 	BbBlock result = (BbBlock)getBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_BLOCK_INDEX);//this is the index of the sequence block
 	//now add on the displacement into the sequence data of the desired element
 	result += SEQUENCE_BLOCK_DATA_START_INDEX + sequenceElement*bn;
-	result += msg;//add on message offset to make index absolute
 	return result;
 }
 /**
@@ -147,7 +146,7 @@ uint32_t getBbSequenceLength(Bb*buf, BbBlock msg, uint16_t i){
 	uint32_t result = 0;
 	//now add on the displacement into the sequence data of the desired element
 	if(si != BB_INVALID_BLOCK){
-		result = getBbUint32(buf, si, SEQUENCE_BLOCK_ELEMENTS_NUM_INDEX);
+		result = getBbUint32(buf, msg + si, SEQUENCE_BLOCK_ELEMENTS_NUM_INDEX);
 	}
 	return result;
 }
