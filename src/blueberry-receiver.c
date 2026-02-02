@@ -206,6 +206,7 @@ bool transceiveBrPacketN(Bb* inP, ByteQ* inQ, ByteQ* outQ, uint32_t n){
 		outP->length = 0;
 
 		makeBbPacketWithQueuedMessages(outP);
+		advanceByteQBack(outQ, outP->length);
 	}
 	return result;
 }
@@ -260,6 +261,17 @@ bool processBlueberryPacket(uint8_t sourceMac[6], uint32_t sourceIp, uint16_t so
 	}
 	if(result){
 		makeBbPacketWithQueuedMessages(outP);
+
+	}
+	if(outP->length > 0){
+//		finishUdpPacket(outUp, nlen);
+//		nlen += sizeof(UdpPacket);
+//		finishIpv4Packet(ni4p, nlen);
+//		nlen += sizeof(Ipv4Packet);
+//		finishAndSendEthernetPacket(nep, nlen);
+		completeUdpPacket(outData, outP->length, false);
+
+		result = true;
 	}
 	return result;
 

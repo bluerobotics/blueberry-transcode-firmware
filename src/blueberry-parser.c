@@ -39,7 +39,7 @@ THE SOFTWARE.
 
 #define MAKE_KEY(mod, msg) ((((uint32_t)mod) << 16) | ((uint32_t)msg))
 
-#define PACKET_PREAMBLE (0x45554c42)
+#define PACKET_PREAMBLE (0x65756c42) //(0x45554c42)
 #define PACKET_PREAMBLE_INDEX (0)
 #define PACKET_LENGTH_INDEX (4)
 #define PACKET_CRC_INDEX (6)
