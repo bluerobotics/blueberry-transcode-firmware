@@ -183,7 +183,7 @@ void setBbUint32(Bb* buf, BbBlock p, uint32_t i, uint32_t v){
  *  @return the value
  */
 int32_t getBbInt32(Bb* buf, BbBlock p, uint32_t i){
-	return (int16_t)getBbUint16(buf, p, i);
+	return (int32_t)getBbUint32(buf, p, i);
 
 }
 
