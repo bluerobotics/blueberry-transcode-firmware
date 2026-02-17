@@ -326,3 +326,58 @@ bool isBbMessageEmpty(Bb* buf, BbBlock msg){
 	uint32_t len = getBbMessageLength(buf, msg);
 	return len < MESSAGE_FIRST_DATA;
 }
+/**
+ * copies the source string to the target, completing on a '\0' or reaching n
+ * @param target - the destination array
+ * @param source - the source array
+ * @param n - the maximum length of target
+ * @return the number of characters copied, not including the terminating '\0' of source
+ */
+static uint32_t stringCopy(char * target, char * source, uint32_t n){
+	uint32_t result = n;
+	for(uint32_t i = 0; i < n; ++i){
+		char c = source[i];
+		if(c == 0x0){
+			result = i;
+			break;
+		}
+		target[i] = c;
+	}
+	return result;
+}
+/**
+ * makes a topic string given a source - assumed to contain placeholders for network ID and device type
+ * substitutes in the specified nid and deviceType and puts the result in the target
+ * placeholder char for nid is 0x80
+ * placeholder char for deviceType is 0x81
+ * @param target - a pointer to the result string
+ * @param targetMaxLen - the size of target - which must not be exceeded
+ * @param source - a pointer to the template topic string
+ * @param nid - the text that the nid placeholder will be replaced with
+ * @param deviceType - the text that the device type placeholder will be replaced with
+ * @return the length of the result string, not including the terminating '\0'
+ */
+uint32_t makeBbTopicString(char * target, uint32_t targetMaxLen, char * source, char * nid, char * deviceType){
+	uint32_t i = 0;//the source index
+	uint32_t j = 0;//the target index
+	uint32_t n = targetMaxLen;//this is the max length of target
+
+	bool notDone = true;
+
+	while(j < n){
+		char c = source[i];
+		if(c == 0x80){
+			j += stringCopy(&target[j], nid, n - j);
+		} else if(c == 0x81){
+			j += stringCopy(&target[j], deviceType, n - j);
+		} else if(c == 0x0){
+			target[j] = 0;
+			break;
+		} else {
+			target[j] = c;
+			++j;
+		}
+		++i;
+	}
+	return j;
+}
