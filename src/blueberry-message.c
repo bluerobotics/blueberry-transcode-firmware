@@ -324,7 +324,7 @@ BbBlock getBbArrayElementIndex(Bb* buf, BbBlock msg, uint16_t i, uint32_t arrayE
  */
 bool isBbMessageEmpty(Bb* buf, BbBlock msg){
 	uint32_t len = getBbMessageLength(buf, msg);
-	return len < MESSAGE_FIRST_DATA;
+	return len <= MESSAGE_FIRST_DATA;
 }
 /**
  * copies the source string to the target, completing on a '\0' or reaching n

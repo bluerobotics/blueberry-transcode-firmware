@@ -109,9 +109,10 @@ void parseBbPacket(Bb* buf){
 	while(msg < packetLength){
 		//we have enough data for a message
 		uint32_t k = getBbMessageKey(buf, msg);
+		//record in the queue that the particular type of message was received
 		queueBbMessage(k);
 		if(isBbMessageEmpty(buf, msg)){
-			break;
+
 		} else {
 
 
@@ -120,10 +121,6 @@ void parseBbPacket(Bb* buf){
 			if(p != NULL){
 				//call the parser
 				(*p)(buf, msg);
-
-				//record in the queue that the particular type of message was received
-				queueBbMessage(k);
-
 			}
 		}
 		uint32_t len = getBbMessageLength(buf, msg);
