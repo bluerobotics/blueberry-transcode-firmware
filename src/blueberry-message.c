@@ -184,6 +184,9 @@ uint32_t getBbStringLength(Bb*buf, BbBlock msg, uint16_t i){
 uint32_t copyBbStringFromMessage(Bb* buf, BbBlock msg, uint16_t i, char* dest, uint32_t n){
 	//get the index of the block containing the string data
 	BbBlock si = (BbBlock)getBbUint16(buf, msg, i + STRING_PLACEHOLDER_BLOCK_INDEX);//this is the index of the sequence block
+	if(isBbBlockInvalid(si)){
+		return;
+	}
 	si += msg;//make index absolute
 	//now add on the displacement into the sequence data of the desired element
 	uint32_t m = getBbUint32(buf, si, STRING_BLOCK_LENGTH_INDEX);
@@ -244,9 +247,12 @@ uint32_t copyBbStringToMessage(Bb* buf, BbBlock msg, uint16_t i, char* src, uint
 
 		//and update the message length to the end of the buffer
 		updateBbMessageLength(buf, msg);
+
+		//now make index relative to msg
+		si -= msg;
 	}
 	//record the string block in the placeholder
-	setBbUint16(buf, msg, i + STRING_PLACEHOLDER_BLOCK_INDEX, si - msg);//make relative to message start
+	setBbUint16(buf, msg, i + STRING_PLACEHOLDER_BLOCK_INDEX, si);//make relative to message start
 	return slen;
 }
 
@@ -292,8 +298,9 @@ BbBlock initBbSequence(Bb* buf, BbBlock msg, uint16_t i, uint32_t elementByteNum
 		//advance buffer by the size of the sequence block
 
 		updateBbMessageLength(buf, msg);
+		result -= msg;//now make relative to current message
 	}
-	setBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_BLOCK_INDEX, (uint16_t)(result - msg));//block index is relative to the message start
+	setBbUint16(buf, msg, i + SEQUENCE_PLACEHOLDER_BLOCK_INDEX, (uint16_t)result);//block index is relative to the message start
 
 	return result;
 }
