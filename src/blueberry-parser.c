@@ -90,7 +90,6 @@ static void registerProcessor(Processors * ps, uint32_t key, BbProcessor p);
 void initBbParser(void){
 	m_parsers.num = 0;
 	m_builders.num = 0;
-	statusLedPacketReceived();
 	registerUdpListener(BB_UDP_PORT, processBlueberryPacket, false);
 	setEthernetPort(BB_UDP_PORT, BB_UDP_PORT);
 }
