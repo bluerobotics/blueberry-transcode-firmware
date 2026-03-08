@@ -185,7 +185,7 @@ uint32_t copyBbStringFromMessage(Bb* buf, BbBlock msg, uint16_t i, char* dest, u
 	//get the index of the block containing the string data
 	BbBlock si = (BbBlock)getBbUint16(buf, msg, i + STRING_PLACEHOLDER_BLOCK_INDEX);//this is the index of the sequence block
 	if(isBbBlockInvalid(si)){
-		return;
+		return 0;
 	}
 	si += msg;//make index absolute
 	//now add on the displacement into the sequence data of the desired element
