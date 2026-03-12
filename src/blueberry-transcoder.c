@@ -182,7 +182,7 @@ void setBbUint32(Bb* buf, BbBlock block, uint16_t i, uint32_t v){
  *  @param i the index offset in bytes
  *  @return the value
  */
-int32_t getBbInt32(Bb* buf, BbBlock p, uint32_t i){
+int32_t getBbInt32(Bb* buf, BbBlock p, uint16_t i){
 	return (int32_t)getBbUint32(buf, p, i);
 
 
