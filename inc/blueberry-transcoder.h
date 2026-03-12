@@ -32,6 +32,7 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Defines
 //*******************************************************************************************
+#define BB_INVALID_BLOCK (0xffff)
 
 //*******************************************************************************************
 //Types
@@ -42,21 +43,22 @@ THE SOFTWARE.
  * Is circular if the length + start is greater than the buffer length
  */
 typedef struct {
-    uint8_t* buffer;//a pointer to an array of bytes (i.e. the buffer)
     uint32_t start;//the index of the first byte of the packet
     uint32_t length;//the length of the packet in bytes
     uint32_t bufferLength;//the length of the buffer, assuming it's circular
     uint32_t time; //the time that this packet was received, in
+    uint8_t* buffer;//a pointer to an array of bytes (i.e. the buffer)
 } Bb;
 
 
 
 /**
  * this is really an index into the buffer, measured in bytes, although it is assumed to be linear,
- * even if the buffer wraps partway through the packet.
+ * even if the buffer wraps part way through the packet.
  * If this value is i and the packet length is n, then 0 <= i < n.
+ * An official invalid value for a block is 0xffff, or BB_INVALID_BLOCK
  */
-typedef uint32_t BbBlock;
+typedef uint16_t BbBlock;
 //typedef uint32_t BbArray;//ditto
 
 //*******************************************************************************************
@@ -71,83 +73,83 @@ typedef uint32_t BbBlock;
 /**
  *  gets an 8-bit, unsigned integer from the specified block
  */
-uint8_t getBbUint8(Bb* buf, BbBlock p, uint32_t i);
+uint8_t getBbUint8(Bb* buf, BbBlock p, uint16_t i);
 
 /**
  * sets an 8-bit, unsigned integer in the specified block
  */
-void setBbUint8(Bb* buf, BbBlock p, uint32_t i, uint8_t v);
+void setBbUint8(Bb* buf, BbBlock p, uint16_t i, uint8_t v);
 
 /**
  * gets an 8-bit, signed integer from thespecified block
  */
-int8_t getBbInt8(Bb* buf, BbBlock p, uint32_t i);
+int8_t getBbInt8(Bb* buf, BbBlock p, uint16_t i);
 
 /**
  * sets an 8-bit signed integer in the specified block
  */
-void setBbInt8(Bb* buf, BbBlock p, uint32_t i, int8_t v);
+void setBbInt8(Bb* buf, BbBlock p, uint16_t i, int8_t v);
 
 
 /**
  *  gets a 16-bit, unsigned integer from the specified block
  */
-uint16_t getBbUint16(Bb* buf, BbBlock p, uint32_t i);
+uint16_t getBbUint16(Bb* buf, BbBlock p, uint16_t i);
 
 /**
  * sets a 16-bit, unsigned integer in the specified block
  */
-void setBbUint16(Bb* buf, BbBlock p, uint32_t i, uint16_t v);
+void setBbUint16(Bb* buf, BbBlock p, uint16_t i, uint16_t v);
 
 /**
  * gets a 16-bit, signed integer from thespecified block
  */
-int16_t getBbInt16(Bb* buf, BbBlock p, uint32_t i);
+int16_t getBbInt16(Bb* buf, BbBlock p, uint16_t i);
 
 /**
  * sets a 16-bit signed integer in the specified block
  */
-void setBbInt16(Bb* buf, BbBlock p, uint32_t i, int16_t v);
+void setBbInt16(Bb* buf, BbBlock p, uint16_t i, int16_t v);
 
 /**
  *  gets a 32-bit, unsigned integer from the specified block
  */
-uint32_t getBbUint32(Bb* buf, BbBlock p, uint32_t i);
+uint32_t getBbUint32(Bb* buf, BbBlock p, uint16_t i);
 
 /**
  * sets a 32-bit, unsigned integer in the specified block
  */
-void setBbUint32(Bb* buf, BbBlock p, uint32_t i, uint32_t v);
+void setBbUint32(Bb* buf, BbBlock p, uint16_t i, uint32_t v);
 
 /**
  * gets a 32-bit, signed integer from thespecified block
  */
-int32_t getBbInt32(Bb* buf, BbBlock p, uint32_t i);
+int32_t getBbInt32(Bb* buf, BbBlock p, uint16_t i);
 
 /**
  * sets a 32-bit signed integer in the specified block
  */
-void setBbInt32(Bb* buf, BbBlock p, uint32_t i, int32_t v);
+void setBbInt32(Bb* buf, BbBlock p, uint16_t i, int32_t v);
 
 /**
  *  gets a 32-bit, floating point value from the specified block
  */
-float getBbFloat32(Bb* buf, BbBlock p, uint32_t i);
+float getBbFloat32(Bb* buf, BbBlock p, uint16_t i);
 
 /**
  * sets a a 32-bit, floating point value in the specified block
  */
-void setBbFloat32(Bb* buf, BbBlock p, uint32_t i, float v);
+void setBbFloat32(Bb* buf, BbBlock p, uint16_t i, float v);
 
 /**
  * extracts a boolean from the specified block
  */
-bool getBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum);
+bool getBbBool(Bb* buf, BbBlock p, uint16_t i, uint32_t bitNum);
 
 /**
  * sets a boolean in a specified block
  */
-void setBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum, bool v);
+void setBbBool(Bb* buf, BbBlock p, uint16_t i, uint32_t bitNum, bool v);
 
 /**
  * converts a linear index to a circular one
@@ -161,42 +163,9 @@ uint32_t bbWrap(Bb* buf, int i);
 uint16_t computeCrc(Bb* buf, BbBlock start, BbBlock end);
 
 /**
- * Gets the number of bytes for each element of a sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
+ * tests if the specified index is not equal to the invalid value 0xffffffff
  */
-uint16_t getBbSequenceElementByteCount(Bb* buf, BbBlock start, int i);
-/**
- * Gets a new block index for the specified sequence element
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- * @param sequenceElement - the index of the sequence element
- */
-BbBlock getBbSequenceElementIndex(Bb* buf, BbBlock start, int i, int sequenceElement);
-/**
- * Gets the number of elements of this sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- */
-uint32_t getBbSequenceLength(Bb* buf, BbBlock start, int i);
-/**
- * Gets the number of bytes for each element of a sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- * @param count - the number of bytes for each element of a sequence
- */
-void setBbSequenceElementByteCount(Bb* buf, BbBlock start, int i, uint16_t count);
-/**Sets the number of bytes for each element of a sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- * @param index - the number of bytes for each element of a sequence
- */
-void setBbSequenceBlockIndex(Bb* buf, BbBlock start, int i, uint16_t index);
-/**
- * Sets the number of elements of this sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- * @param length - the number of elements
- */
-void setBbSequenceLength(Bb* buf, BbBlock start, int i, uint32_t length);
-
-
-
-
+bool isBbIndexValid(BbBlock b);
 
 //*******************************************************************************************
 //Code

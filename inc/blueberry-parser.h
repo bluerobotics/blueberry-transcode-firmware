@@ -43,19 +43,14 @@ THE SOFTWARE.
 //Types
 //*******************************************************************************************
 /**
- * A function pointer prototype for parsing a message
- * @param bb - the buffer containing the message
- * @param msg - an index to the message to be parsed
+ * A function pointer prototype for processing a message
+ * These are either used for parsing a message or building a message
+ * @param bb - the buffer containing or to contain the message
+ * @param msg - an index to the start of the message to be parsed or built
  */
-typedef void (*BbParser)(Bb* bb, BbBlock msg);
+typedef void (*BbProcessor)(Bb* bb, BbBlock msg);
 
-/**
- * A function pointer prototype for creating a message
- * @param bb - the buffer that will contain the message
- * @param msg - the block where the message shall be written
- * @return - the next block after the new message is written
- */
-typedef BbBlock (*BbBuilder)(Bb* bb, BbBlock msg);
+
 //*******************************************************************************************
 //Variables
 //*******************************************************************************************
@@ -71,7 +66,12 @@ void parseBbPacket(Bb* buf);
 /**
  * registers a parser for a given message
  */
-void registerBbParser(uint16_t moduleKey, uint16_t messageKey, BbParser parser);
+void registerBbParser(uint32_t moduleMessageKey, BbProcessor parser);
+
+/**
+ * register a message processor for adding a message to a buffer
+ */
+void registerBbBuilder(uint32_t moduleMessageKey, BbProcessor builder);
 
 /**
  * Must be called at init
@@ -107,6 +107,29 @@ void finishBbPacket(Bb* bb);
  * checks if a potential packet has at least enough bytes received to contain a packet header
  */
 bool minBbLengthCheck(Bb* bb);
+
+/**
+ * indicates that messages were received and should trigger a corresponding packet of messages to be sent
+ */
+bool isBbPacketRequested();
+/**
+ * requests that the next packet should have the message with the specified key added.
+ * @param key - the module/message key for the desired message
+ */
+void queueBbMessage(uint32_t key);
+
+/**
+ * Make a packet in the specified buffer that contains all queued messages
+ * bb - the buffer to make the packet in
+ */
+void makeBbPacketWithQueuedMessages(Bb* bb);
+
+/**
+ * takes the specified value and rounds it up to the nearest multiple of 4
+ * this is useful to compute the next greater index that is word-aligned
+ * or to round up a message length to the nearest 4-bytes
+ */
+BbBlock bbAlign(uint16_t i);
 
 //*******************************************************************************************
 //Code

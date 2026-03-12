@@ -50,165 +50,166 @@ THE SOFTWARE.
 /**
  *  gets an 8-bit, unsigned integer from the specified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
  *  @return the value
  */
-uint8_t getBbUint8(Bb* buf, BbBlock p, uint32_t i){
-	return buf->buffer[bbWrap(buf, p + i)];
+uint8_t getBbUint8(Bb* buf, BbBlock block, uint16_t i){
+	return buf->buffer[bbWrap(buf, block + i)];
 }
 
 /**
  * sets an 8-bit, unsigned integer in the specified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbUint8(Bb* buf, BbBlock p, uint32_t i, uint8_t v){
-	buf->buffer[bbWrap(buf, p + i)] = v;
+void setBbUint8(Bb* buf, BbBlock block, uint16_t i, uint8_t v){
+	buf->buffer[bbWrap(buf, block + i)] = v;
 }
 
 /**
  * gets an 8-bit, signed integer from thespecified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
  *  @return the value
  */
-int8_t getBbInt8(Bb* buf, BbBlock p, uint32_t i){
-	return (int8_t)getBbUint8(buf, p, i);
+int8_t getBbInt8(Bb* buf, BbBlock block, uint16_t i){
+	return (int8_t)getBbUint8(buf, block, i);
 }
 
 /**
  * sets an 8-bit signed integer in the specified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbInt8(Bb* buf, BbBlock p, uint32_t i, int8_t v){
-	setBbUint8(buf, p, i, (uint8_t)v);
+void setBbInt8(Bb* buf, BbBlock block, uint16_t i, int8_t v){
+	setBbUint8(buf, block, i, (uint8_t)v);
 }
 
 
 /**
  *  gets a 16-bit, unsigned integer from the specified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
  *  @return the value
  */
-uint16_t getBbUint16(Bb* buf, BbBlock p, uint32_t i){
+uint16_t getBbUint16(Bb* buf, BbBlock block, uint16_t i){
 	uint16_t result;
 	uint8_t* bs = (uint8_t*)&result;
-	bs[0] = getBbUint8(buf, p, i);
-	bs[1] = getBbUint8(buf, p, i+1);
+	bs[0] = getBbUint8(buf, block, i);
+	bs[1] = getBbUint8(buf, block, i+1);
 	return result;
 }
 
 /**
  * sets a 16-bit, unsigned integer in the specified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbUint16(Bb* buf, BbBlock p, uint32_t i, uint16_t v){
+void setBbUint16(Bb* buf, BbBlock block, uint16_t i, uint16_t v){
 	uint8_t* bs = (uint8_t*)&v;
-	setBbUint8(buf, p, i,   bs[0]);
-	setBbUint8(buf, p, i+1, bs[1]);
+	setBbUint8(buf, block, i,   bs[0]);
+	setBbUint8(buf, block, i+1, bs[1]);
 }
 
 /**
  * gets a 16-bit, signed integer from thespecified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
  *  @return the value
  */
-int16_t getBbInt16(Bb* buf, BbBlock p, uint32_t i){
-	return (int16_t)getBbUint16(buf, p, i);
+int16_t getBbInt16(Bb* buf, BbBlock block, uint16_t i){
+	return (int16_t)getBbUint16(buf, block, i);
 }
 
 /**
  * sets a 16-bit signed integer in the specified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbInt16(Bb* buf, BbBlock p, uint32_t i, int16_t v){
-	setBbUint16(buf, p, i, (uint16_t)v);
+void setBbInt16(Bb* buf, BbBlock block, uint16_t i, int16_t v){
+	setBbUint16(buf, block, i, (uint16_t)v);
 }
 
 /**
  *  gets a 32-bit, unsigned integer from the specified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
  *  @return the value
  */
-uint32_t getBbUint32(Bb* buf, BbBlock p, uint32_t i){
+uint32_t getBbUint32(Bb* buf, BbBlock block, uint16_t i){
 	uint32_t result;
 	uint8_t* bs = (uint8_t*)&result;
-	bs[0] = getBbUint8(buf, p, i);
-	bs[1] = getBbUint8(buf, p, i+1);
-	bs[2] = getBbUint8(buf, p, i+2);
-	bs[3] = getBbUint8(buf, p, i+3);
+	bs[0] = getBbUint8(buf, block, i);
+	bs[1] = getBbUint8(buf, block, i+1);
+	bs[2] = getBbUint8(buf, block, i+2);
+	bs[3] = getBbUint8(buf, block, i+3);
 	return result;
 }
 
 /**
  * sets a 32-bit, unsigned integer in the specified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbUint32(Bb* buf, BbBlock p, uint32_t i, uint32_t v){
+void setBbUint32(Bb* buf, BbBlock block, uint16_t i, uint32_t v){
 	uint8_t* bs = (uint8_t*)&v;
-	setBbUint8(buf, p, i,   bs[0]);
-	setBbUint8(buf, p, i+1, bs[1]);
-	setBbUint8(buf, p, i+2, bs[2]);
-	setBbUint8(buf, p, i+3, bs[3]);
+	setBbUint8(buf, block, i,   bs[0]);
+	setBbUint8(buf, block, i+1, bs[1]);
+	setBbUint8(buf, block, i+2, bs[2]);
+	setBbUint8(buf, block, i+3, bs[3]);
 
 }
 
 /**
  * gets a 32-bit, signed integer from thespecified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
  *  @return the value
  */
 int32_t getBbInt32(Bb* buf, BbBlock p, uint32_t i){
 	return (int32_t)getBbUint32(buf, p, i);
 
+
 }
 
 /**
  * sets a 32-bit signed integer in the specified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbInt32(Bb* buf, BbBlock p, uint32_t i, int32_t v){
-	setBbUint32(buf, p, i, (uint32_t)v);
+void setBbInt32(Bb* buf, BbBlock block, uint16_t i, int32_t v){
+	setBbUint32(buf, block, i, (uint32_t)v);
 
 }
 
 /**
  *  gets a 32-bit, floating point value from the specified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
  *  @return the value
  *
  */
-float getBbFloat32(Bb* buf, BbBlock p, uint32_t i){
-	uint32_t ip = getBbUint32(buf, p, i);
+float getBbFloat32(Bb* buf, BbBlock block, uint16_t i){
+	uint32_t ip = getBbUint32(buf, block, i);
 	float* fp = (float*)(&ip);
 	return *fp;
 }
@@ -216,38 +217,40 @@ float getBbFloat32(Bb* buf, BbBlock p, uint32_t i){
 /**
  * sets a a 32-bit, floating point value in the specified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
  *  @param v the value to write
  */
-void setBbFloat32(Bb* buf, BbBlock p, uint32_t i, float v){
+void setBbFloat32(Bb* buf, BbBlock block, uint16_t i, float v){
 	float* fp = &v;
 	uint32_t* ip = (uint32_t*)fp;
-	setBbUint32(buf, p, i, *ip);
+	setBbUint32(buf, block, i, *ip);
 }
 
 /**
  * extracts a boolean from the specified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
+ *  @param bitMask the mask for the bit in question: (1<<bitNum)
  *  @return the value
  */
-bool getBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum){
-	uint8_t bf = getBbUint8(buf, p, i);
-	return (bf & (1<<bitNum)) != 0;
+bool getBbBool(Bb* buf, BbBlock block, uint16_t i, uint32_t bitMask){
+	uint8_t bf = getBbUint8(buf, block, i);
+	return (bf & bitMask) != 0;
 }
 
 /**
  * sets a boolean in a specified block
  *  @param buf the buffer to read
- *  @param p the block offset in bytes
+ *  @param block the block offset in bytes
  *  @param i the index offset in bytes
+ *  @param bitMask the mask for the bit in question: (1<<bitNum)
  *  @param v the value to write
  */
-void setBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum, bool v){
-	uint8_t* b = &(buf->buffer[bbWrap(buf, p + i)]);
-	uint8_t m = 1 << bitNum;
+void setBbBool(Bb* buf, BbBlock block, uint16_t i, uint32_t bitMask, bool v){
+	uint8_t* b = &(buf->buffer[bbWrap(buf, block + i)]);
+	uint8_t m = bitMask;
 	if(v){
 		*b |= m;
 	} else {
@@ -256,26 +259,34 @@ void setBbBool(Bb* buf, BbBlock p, uint32_t i, uint32_t bitNum, bool v){
 }
 
 /**
+ * Checks for overflows and
  * converts a linear index to a circular one
  * essentially mods the index with the buffer size
  * @return the wrapped index
  */
 uint32_t bbWrap(Bb* buf, int i){
-	uint32_t j = i + buf->start;
-	uint32_t n = buf->bufferLength;
-	return j % n;
+	uint32_t j;
+	if(i >= buf->length){
+		j = 0;//this should be safe but will obviously return the wrong value
+		asm("nop");
+	} else {
+		j = i + buf->start;
+		uint32_t n = buf->bufferLength;
+		j %= n;
+	}
+	return j;
 }
 /**
  * computes the crc of the buffer
  * @param buf the buffer
- * @param start the first element
+ * @param block the first element
  * @param one past the last element
  */
-uint16_t computeCrc(Bb* buf, BbBlock start, BbBlock end){
+uint16_t computeCrc(Bb* buf, BbBlock block, BbBlock end){
 
 	uint16_t crc;
 	resetCrc1021P(&crc);
-	for(uint32_t i = start; i < end; i += 4){
+	for(uint16_t i = block; i < end; i += 4){
 		uint32_t w = getBbUint32(buf, i, 0);
 
 		crc1021P32(&crc, w);
@@ -288,51 +299,10 @@ uint16_t computeCrc(Bb* buf, BbBlock start, BbBlock end){
 }
 
 /**
- * Gets the number of bytes for each element of a sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
+ * tests if the specified index is not equal to the invalid value 0xffffffff
  */
-uint16_t getBbSequenceElementByteCount(Bb* buf, BbBlock start, int i){
-	return getBbUint16(buf, start, i+2);
+bool isBbBlockInvalid(BbBlock b){
+	return b == BB_INVALID_BLOCK;
 }
-/**
- * Gets a new index for the specified sequence element. this can be used to read or write from the specified sequence element
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- * @param sequenceElement - the index of the sequence element. This must be smaller than the sequence length - but this is not checked here.
- */
-uint32_t getBbSequenceElementIndex(Bb* buf, BbBlock start, int i, int sequenceElement){
-	uint32_t bn = getBbSequenceElementByteCount(buf, start, i);
-//	uint32_t n = getBbSequenceLength(buf, start, i);
-	uint32_t i0 = (uint32_t)getBbUint16(buf, start, i) + 4;//data starts 4 bytes after the first word - which is the length field
-	uint32_t i2 = i0 + sequenceElement*bn;
-	return i2;
-}
-/**
- * Gets the number of elements of this sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- */
-uint32_t getBbSequenceLength(Bb* buf, BbBlock start, int i){
-	return getBbUint32(buf, start, (uint32_t)getBbUint16(buf, start, i));
-}
-/**
- * Gets the number of bytes for each element of a sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- * @param count - the number of bytes for each element of a sequence
- */
-void setBbSequenceElementByteCount(Bb* buf, BbBlock start, int i, uint16_t count){
-	setBbUint16(buf, start, i+2, count);
-}
-/**Sets the number of bytes for each element of a sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- * @param index - the number of bytes for each element of a sequence
- */
-void setBbSequenceBlockIndex(Bb* buf, BbBlock start, int i, uint16_t index){
-	setBbUint16(buf, start, i, index);
-}
-/**
- * Sets the number of elements of this sequence
- * @param i - the index (in bytes) of the sequence message placeholder (which consists of a an index to the sequence length field (uint16) and the element byte count (uint16))
- * @param length - the number of elements
- */
-void setBbSequenceLength(Bb* buf, BbBlock start, int i, uint32_t length){
-	setBbUint32(buf, start, (uint32_t)getBbUint16(buf, start, i), length);
-}
+
+
