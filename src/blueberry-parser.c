@@ -36,7 +36,7 @@ THE SOFTWARE.
 //Defines
 //*******************************************************************************************
 #define PROCESSOR_NUM (100)
-#define MSG_Q_SIZE (20)
+#define MSG_Q_SIZE (50)
 
 #define MAKE_KEY(mod, msg) ((((uint32_t)mod) << 16) | ((uint32_t)msg))
 
