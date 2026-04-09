@@ -230,7 +230,7 @@ bool processBlueberryPacket(uint8_t sourceMac[6], uint32_t sourceIp, uint16_t so
 //	UdpPacket* outUp = addUdpPacket(ni4p, BR_PORT, BR_PORT);
 	uint32_t maxSize = 0;
 	uint8_t* outData = NULL;
-	outData = startUdpPacket(sourceMac, sourceIp, BB_UDP_PORT, BB_UDP_PORT, &maxSize);
+	outData = startUdpPacket(sourceMac, sourceIp, sourcePort, BB_UDP_PORT, &maxSize);
 	//this is where the BR packet data will be processed
 
 
