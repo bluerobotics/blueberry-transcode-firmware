@@ -96,6 +96,12 @@ bool checkBbCrc(Bb* bb);
  */
 BbBlock startBbPacket(Bb* bb);
 
+
+
+/**
+ * resets the buffer so it's as if there was no packet started
+ */
+void undoBbPacketStart(Bb* bb);
 /**
  * Finalize the packet in preparation for sending
  * This relies on the buffer having the final length set correctly
@@ -120,7 +126,9 @@ void queueBbMessage(uint32_t key);
 
 /**
  * Make a packet in the specified buffer that contains all queued messages
- * bb - the buffer to make the packet in
+ * Note that a packet may not be fully completed, in which case the buffer will still have a length of zero
+ * @param bb - the buffer to make the packet in
+
  */
 void makeBbPacketWithQueuedMessages(Bb* bb);
 
@@ -130,6 +138,13 @@ void makeBbPacketWithQueuedMessages(Bb* bb);
  * or to round up a message length to the nearest 4-bytes
  */
 BbBlock bbAlign(uint16_t i);
+
+/**
+ * Checks if we've recevied a packet within the specified time
+ * @param microseconds - the specified timeout
+ * @return true if time since last received packet is greater than the specified time
+ */
+bool isLastPacketTimeNotWithin(uint32_t microseconds);
 
 //*******************************************************************************************
 //Code

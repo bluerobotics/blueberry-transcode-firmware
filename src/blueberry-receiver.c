@@ -47,6 +47,9 @@ THE SOFTWARE.
 //*******************************************************************************************
 //Variables
 //*******************************************************************************************
+
+static uint32_t m_lastRxTime = 0;
+
 //*******************************************************************************************
 //Function Prototypes
 //*******************************************************************************************
@@ -241,6 +244,12 @@ bool processBlueberryPacket(uint8_t sourceMac[6], uint32_t sourceIp, uint16_t so
 	Bb* inP = &inB;
 	Bb* outP = &outB;
 
+
+	//if the recevied packet was not sent to a broadcast IP then record the time
+	if((destIp & 0xff) !=  0xff){
+		m_lastRxTime = getTimeInMicroSeconds();
+	}
+
 	inP->buffer = data;
 	inP->length = dataLength;
 	inP->bufferLength = dataLength;
@@ -271,8 +280,17 @@ bool processBlueberryPacket(uint8_t sourceMac[6], uint32_t sourceIp, uint16_t so
 //		finishAndSendEthernetPacket(nep, nlen);
 		completeUdpPacket(outData, outP->length, false);
 
-		result = true;
+
 	}
 	return result;
 
 }
+/**
+ * Checks if we've recevied a packet within the specified time. Specifically checks to see if we HAVEN'T
+ * @param microseconds - the specified timeout
+ * @return true if time since last received packet is greater than the specified time
+ */
+bool isLastPacketTimeNotWithin(uint32_t microseconds){
+	return slowTimer(&m_lastRxTime, microseconds);
+}
+

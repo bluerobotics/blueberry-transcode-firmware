@@ -99,6 +99,7 @@ void initBbParser(void){
  * This assumes that the buffer has been properly received and is at the start of the packet
  */
 void parseBbPacket(Bb* buf){
+
 	uint32_t packetLength = getBbUint16(buf, 0, PACKET_LENGTH_INDEX)*4;
 	if(packetLength == 0){
 		return;
@@ -282,6 +283,12 @@ BbBlock startBbPacket(Bb* bb){
 	return PACKET_FIRST_MESSAGE_INDEX;
 }
 /**
+ * resets the buffer so it's as if there was no packet started
+ */
+void undoBbPacketStart(Bb* bb){
+	bb->length = 0;
+}
+/**
  * Finalize the packet in preparation for sending
  * This relies on the buffer having the final length set correctly
  * And all messages construted correctly
@@ -303,11 +310,14 @@ bool isBbPacketRequested(){
 
 /**
  * Make a packet in the specified buffer that contains all queued messages
- * bb - the buffer to make the packet in
+ * Note that a packet may not be fully completed, in which case the buffer will still have a length of zero
+ * @param bb - the buffer to make the packet in
+
  */
 void makeBbPacketWithQueuedMessages(Bb* bb){
 	bool started = false;
 	BbBlock msg = PACKET_FIRST_MESSAGE_INDEX;
+
 	while(isQueueNotEmpty(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE)){
 		uint32_t key = m_rxQ[m_rxQFront];
 		doneWithQueueFront(&m_rxQFront, &m_rxQBack, MSG_Q_SIZE);
@@ -326,7 +336,11 @@ void makeBbPacketWithQueuedMessages(Bb* bb){
 
 
 	}
-	finishBbPacket(bb);
+	if(started && bb->length > PACKET_FIRST_MESSAGE_INDEX){
+		finishBbPacket(bb);
+	} else {
+		undoBbPacketStart(bb);
+	}
 
 
 
